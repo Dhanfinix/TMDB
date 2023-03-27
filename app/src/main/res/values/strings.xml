@@ -39,5 +39,7 @@
     <string name="add_to_watch_list">Add to Watch List</string>
     <string name="comment_section">Comment Section</string>
     <string name="write_review">Write Review</string>
+    <string name="biography">Biography</string>
+    <string name="known_for">Known For</string>
 </resources>
 

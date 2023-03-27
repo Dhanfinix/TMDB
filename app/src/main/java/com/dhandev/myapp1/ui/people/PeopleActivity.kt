@@ -13,6 +13,7 @@ import com.dhandev.myapp1.BuildConfig
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.remote.network.ApiConfig
 import com.dhandev.myapp1.data.source.remote.response.PeopleResponse
+import com.dhandev.myapp1.data.source.remote.response.ResultsPeopleItem
 import com.dhandev.myapp1.databinding.ActivityPeopleBinding
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
@@ -40,12 +41,12 @@ class PeopleActivity : AppCompatActivity() {
         linearLayoutManager = GridLayoutManager(this, 3)
         binding.rvList.layoutManager = linearLayoutManager
 
-//        adapter.delegate = object : PeopleDelegate {
-//            override fun onItemClicked(selected: ResultsPeopleItem) {
-//                DetailActivity.open(this@PeopleActivity, "Detail", selected)
-//            }
-//
-//        }
+        adapter.delegate = object : PeopleDelegate {
+            override fun onItemClicked(selected: ResultsPeopleItem) {
+                PeopleDetailActivity.open(this@PeopleActivity, "Detail", selected)
+            }
+
+        }
         skeleton = binding.rvList.applySkeleton(R.layout.list_row_people_item, 9)
 
         skeleton.showSkeleton()
