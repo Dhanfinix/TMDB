@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">TMDB</string>
+    <string name="button">Button</string>
+    <string name="search_movie">Search Movie…</string>
+    <string name="search_your_favorite_movie_here">Search Your Favorite Movie Here</string>
+    <string name="movies">Movies</string>
+    <string name="tv_shows">TV Shows</string>
+    <string name="people">People</string>
+    <string name="tdp_batch_3_android_session">TDP Batch 3 - Android Session</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="popular">Popular</string>
+    <string name="on_the_air">On The Air</string>
+    <string name="airing_today">Airing Today</string>
+    <string name="popular_people">Popular People</string>
+    <string name="activity_2">Activity 2</string>
+    <string name="back">Back</string>
+    <string name="icon_aplikasi">Icon Aplikasi</string>
+    <string name="lorem_ipsum_dolor_sit_amet">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="overview">Overview</string>
+    <string name="poster_image">Poster Image</string>
+    <string name="backdrop_image">Backdrop Image</string>
+    <string name="not_found_image">Not Found Image</string>
+    <string name="lorem">Lorem ipsum dolor sit amet Lorem ipsum dolor sit ametLorem ipsum dolor sit ametLorem ipsum dolor sit amet Lorem ipsum dolor sit amet</string>
+    <string name="rating">🌟 %1$s</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_pass">Password</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="please_login">Please login first before use the app</string>
+    <string name="favorite">Favorite</string>
+    <string name="remove_fav">Remove Favorite</string>
+    <string name="remove_watchlist">Remove Watch List</string>
+    <string name="added_to_favorite">Added to favorite</string>
+    <string name="removed_from_fav">Removed from favorite</string>
+    <string name="title">Title</string>
+    <string name="release_date">20-12-2001</string>
+    <string name="add_to_watch_list">Add to Watch List</string>
+    <string name="comment_section">Comment Section</string>
+    <string name="write_review">Write Review</string>
+</resources>
+

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bottom"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/main_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/logo"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/icon_aplikasi" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#32FFFFFF"
+            android:padding="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="@string/search_your_favorite_movie_here"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white"
+                android:layout_marginBottom="8dp"/>
+
+            <EditText
+                android:id="@+id/search_bar"
+                android:layout_width="match_parent"
+                android:maxWidth="480dp"
+                android:layout_height="48dp"
+                android:background="@drawable/rounded_border"
+                android:padding="8dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:hint="@string/search_movie"
+                android:drawableEnd="@drawable/search_alt_svgrepo_com"
+                android:layout_marginBottom="16dp"
+                android:inputType="text"
+                android:importantForAutofill="no" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/movies"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/btn_mov_top"
+                    style="@style/main_btn_textView"
+                    android:text="@string/top_rated"
+                    android:layout_marginEnd="10dp"
+                    app:drawableTopCompat="@drawable/icons8_imovie_50" />
+
+                <TextView
+                    android:id="@+id/btn_mov_upcoming"
+                    style="@style/main_btn_textView"
+                    android:text="@string/upcoming"
+                    android:layout_marginEnd="10dp"
+                    app:drawableTopCompat="@drawable/icons8_movie_projector_50" />
+
+                <TextView
+                    android:id="@+id/btn_mov_now"
+                    style="@style/main_btn_textView"
+                    android:text="@string/now_playing"
+                    android:layout_marginEnd="10dp"
+                    app:drawableTopCompat="@drawable/now_playing_movie_50" />
+
+                <TextView
+                    android:id="@+id/btn_mov_popular"
+                    style="@style/main_btn_textView"
+                    android:text="@string/popular"
+                    android:layout_marginEnd="10dp"
+                    app:drawableTopCompat="@drawable/icons8_movie_ticket_50" />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tv_shows"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/btn_tv_popular"
+                    style="@style/main_btn_textView"
+                    android:text="@string/popular"
+                    android:layout_marginEnd="10dp"
+                    app:drawableTopCompat="@drawable/icons8_retro_tv_filled_50" />
+                <TextView
+                    android:id="@+id/btn_tv_top"
+                    style="@style/main_btn_textView"
+                    android:text="@string/top_rated"
+                    android:layout_marginEnd="10dp"
+                    app:drawableTopCompat="@drawable/top_rated_tv_50" />
+                <TextView
+                    android:id="@+id/btn_tv_onair"
+                    style="@style/main_btn_textView"
+                    android:text="@string/on_the_air"
+                    android:layout_marginEnd="10dp"
+                    app:drawableTopCompat="@drawable/icons8_clapperboard_50" />
+                <TextView
+                    android:id="@+id/btn_tv_airtoday"
+                    style="@style/main_btn_textView"
+                    android:text= "@string/airing_today"
+                    app:drawableTopCompat="@drawable/icons8_cinema_50" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/people"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/btn_people_popular"
+                    style="@style/main_btn_textView"
+                    android:text= "@string/popular_people"
+                    app:drawableTopCompat="@drawable/pop_people_50" />
+
+                <TextView
+                    style="@style/main_btn_textView"
+                    android:visibility="invisible"
+                    android:layout_marginEnd="10dp"/>
+                <TextView
+                    style="@style/main_btn_textView"
+                    android:visibility="invisible"
+                    android:layout_marginEnd="10dp"/>
+                <TextView
+                    style="@style/main_btn_textView"
+                    android:visibility="invisible"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tdp_batch_3_android_session"
+            android:layout_marginVertical="16dp"
+            android:textAlignment="center"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="8dp"/>
+
+    </LinearLayout>
+
+</ScrollView>

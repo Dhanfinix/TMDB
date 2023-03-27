@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bottom"
+    tools:context=".ui.detail.DetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <ImageView
+            android:id="@+id/not_found"
+            android:padding="50dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/result_not_found_1"
+            android:contentDescription="@string/not_found_image"
+            android:visibility="gone"/>
+
+<!--        need frameLayout, if not the poster will cutted if using negative margin-->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="280dp">
+            <ImageView
+                android:id="@+id/iv_backdrop"
+                android:layout_width="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/spiderman_bd"
+                android:layout_height="200dp"
+                android:contentDescription="@string/backdrop_image" />
+            <ImageView
+                android:id="@+id/iv_poster"
+                android:layout_width="130dp"
+                android:layout_height="180dp"
+                android:scaleType="fitCenter"
+                android:layout_gravity="center|bottom"
+                android:src="@drawable/spiderman_poster"
+                android:contentDescription="@string/poster_image" />
+        </FrameLayout>
+
+
+        <TextView
+            android:id="@+id/tv_overview_title"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textAlignment="center"
+            android:text="@string/title"
+            android:textColor="@color/white"/>
+        <TextView
+            android:id="@+id/tv_release_date"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:textAlignment="center"
+            tools:text="@string/release_date"
+            android:textColor="@color/white"/>
+        <TextView
+            android:id="@+id/tv_rating"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:textAlignment="center"
+            tools:text="@string/rating"
+            android:textColor="@color/white"/>
+
+        <Button
+            android:id="@+id/btn_fav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:text="@string/add_to_watch_list"
+            android:foreground="@drawable/rounded_border"
+            android:backgroundTint="@color/transparent"
+            android:textAllCaps="false"/>
+
+        <TextView
+            android:id="@+id/tv_overview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_margin="8dp"
+            android:text="@string/lorem_ipsum_dolor_sit_amet"
+            android:textColor="@color/white"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_weight="1"
+                android:text="@string/comment_section"/>
+            <TextView
+                android:id="@+id/btnAddReview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="@string/write_review"/>
+        </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/list_row_item"
+            android:orientation="vertical"/>
+    </LinearLayout>
+</ScrollView>
