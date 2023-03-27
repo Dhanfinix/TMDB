@@ -49,7 +49,12 @@ class DetailActivity : AppCompatActivity() {
                 intent.getParcelableExtra(DETAIL_INFO, ResultsItem::class.java)
             }
         } else {
-            intent.getParcelableExtra(DETAIL_INFO)
+            if (isFav){
+                val dataFav = intent.getParcelableExtra<MovieEntity>(DETAIL_INFO)
+                ResultsItem(dataFav?.overview, dataFav?.originalTitle, dataFav?.title, dataFav?.releaseDate, dataFav?.posterPath, dataFav?.backdropPath, dataFav?.voteAverage, dataFav?.id)
+            } else {
+                intent.getParcelableExtra(DETAIL_INFO)
+            }
         }
         title = intent.getStringExtra(PAGE_TITLE)
         setContentView(binding.root)

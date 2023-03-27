@@ -1,7 +1,6 @@
 package com.dhandev.myapp1.data.source.remote.response
 
 import android.os.Parcelable
-import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
@@ -26,7 +25,6 @@ data class MovieTvResponse(
 
 @Parcelize
 @Serializable
-@Entity(tableName = "movies")
 data class ResultsItem(
 
 	@field:SerializedName("overview")
