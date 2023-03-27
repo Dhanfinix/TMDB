@@ -23,6 +23,7 @@ class CommentActivity : AppCompatActivity() {
         title = getString(R.string.comment)
 
         val movieTvId = intent.getIntExtra(MOVIETV_ID, 0)
+
         binding.apply {
 
             btnComment.setOnClickListener {
@@ -30,6 +31,7 @@ class CommentActivity : AppCompatActivity() {
                 val comment = etBodyComment.text.toString()
                 if (validate(name, comment)){
                     viewModel.insertComment(this@CommentActivity, CommentEntity(username = name, commentBody = comment, movieId = movieTvId))
+                    finish()
                 }
             }
 

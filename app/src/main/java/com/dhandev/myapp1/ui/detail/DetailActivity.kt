@@ -11,6 +11,9 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -18,6 +21,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.dhandev.myapp1.R
+import com.dhandev.myapp1.data.source.local.entity.CommentEntity
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityDetailBinding
@@ -30,6 +34,8 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var skeleton: Skeleton
     private lateinit var skeletonPoster: Skeleton
     private lateinit var binding: ActivityDetailBinding
+    private lateinit var adapter : DetailCommentListAdapter
+    private lateinit var linearLayoutManager: LinearLayoutManager
     private val viewModel : DetailViewModel by viewModels()
 //    private lateinit var db : AppDatabase
     private var data : ResultsItem? = null
@@ -37,6 +43,20 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
         supportActionBar?.setHomeButtonEnabled(true)
+        setContentView(binding.root)
+
+        adapter = DetailCommentListAdapter()
+        binding.rvComment.adapter = adapter
+
+        linearLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        binding.rvComment.layoutManager = linearLayoutManager
+
+        adapter.delegate = object : CommentListDelegate {
+            override fun onItemClicked(selected: CommentEntity) {
+                CommentActivity.openToUpdate(this@DetailActivity, selected)
+            }
+        }
+
         val isFav = intent.getBooleanExtra(FAVORITE, false)
         data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (isFav){
@@ -53,7 +73,6 @@ class DetailActivity : AppCompatActivity() {
             }
         }
         title = intent.getStringExtra(PAGE_TITLE)
-        setContentView(binding.root)
 
         binding.apply {
             skeleton = ivBackdrop.createSkeleton()
@@ -146,12 +165,15 @@ class DetailActivity : AppCompatActivity() {
             }
 
             data?.id?.let { viewModel.getCommentById(this@DetailActivity, it).observe(this@DetailActivity){ result ->
-                if(result == null){
+
+                if(result == null || result.isEmpty()){
                     noCommentsFound.text = getString(R.string.no_comments_available)
                     noCommentsFound.visibility = View.VISIBLE
                 } else {
                     noCommentsFound.text = getString(R.string.lorem)
                     noCommentsFound.visibility = View.GONE
+                    adapter.setAdapter(result)
+                    binding.rvComment.isVisible = result.isNotEmpty()
                 }
                 }
             }

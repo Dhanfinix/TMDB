@@ -15,7 +15,7 @@ interface CommentDao {
     fun getAllComment(): List<CommentEntity>
 
     @Query("SELECT * FROM comment WHERE movie_id = :movie_id")
-    fun getById(movie_id:Int): CommentEntity
+    fun getById(movie_id:Int): List<CommentEntity>
 
     @Delete
     fun deleteAll(data: CommentEntity)

@@ -35,8 +35,8 @@ class DetailViewModel: ViewModel() {
     }
 
     //COMMENT
-    fun getCommentById(context: Context, id: Int): LiveData<CommentEntity> {
-        val result = MutableLiveData<CommentEntity>()
+    fun getCommentById(context: Context, id: Int): LiveData<List<CommentEntity>> {
+        val result = MutableLiveData<List<CommentEntity>>()
         viewModelScope.launch(Dispatchers.IO) {
             result.postValue(CommentDatabase.getDatabase(context).commentDao().getById(id))
         }

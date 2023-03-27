@@ -83,10 +83,15 @@
             android:layout_margin="8dp"
             android:text="@string/lorem_ipsum_dolor_sit_amet"
             android:textColor="@color/white"/>
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/white"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
             android:layout_margin="8dp"
             android:orientation="horizontal">
             <TextView
@@ -106,7 +111,7 @@
             android:id="@+id/rvComment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/list_row_item"
+            tools:listitem="@layout/list_row_item_comment"
             android:orientation="vertical"/>
         <TextView
             android:id="@+id/no_comments_found"
