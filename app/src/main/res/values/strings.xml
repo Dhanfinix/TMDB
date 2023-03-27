@@ -32,8 +32,8 @@
     <string name="favorite">Favorite</string>
     <string name="remove_fav">Remove Favorite</string>
     <string name="remove_watchlist">Remove Watch List</string>
-    <string name="added_to_favorite">Added to favorite</string>
-    <string name="removed_from_fav">Removed from favorite</string>
+    <string name="added_to_watchlist">Added to Watch List</string>
+    <string name="removed_from_watch_list">Removed from Watch List</string>
     <string name="title">Title</string>
     <string name="release_date">20-12-2001</string>
     <string name="add_to_watch_list">Add to Watch List</string>
@@ -41,5 +41,14 @@
     <string name="write_review">Write Review</string>
     <string name="biography">Biography</string>
     <string name="known_for">Known For</string>
+    <string name="your_watch_list">Your Watch List</string>
+    <string name="show_all">Show All</string>
+    <string name="no_watch_list_added">No Watch List Added</string>
+    <string name="my_watch_list">My Watch List</string>
+    <string name="no_comments_available">No Comments Available</string>
+    <string name="comment">Comment</string>
+    <string name="name">Name</string>
+    <string name="please_fill_your_name">Please fill your name…</string>
+    <string name="submit">Submit</string>
 </resources>
 

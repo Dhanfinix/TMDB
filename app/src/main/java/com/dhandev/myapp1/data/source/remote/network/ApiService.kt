@@ -1,6 +1,7 @@
 package com.dhandev.myapp1.data.source.remote.network
 
 import com.dhandev.myapp1.data.source.remote.response.MovieTvResponse
+import com.dhandev.myapp1.data.source.remote.response.PeopleDetailResponse
 import com.dhandev.myapp1.data.source.remote.response.PeopleResponse
 import retrofit2.Call
 import retrofit2.http.GET
@@ -24,4 +25,11 @@ interface ApiService {
         @Query("page") page: Int,
     ): Call<PeopleResponse>
 
+    @GET("person/{id}")
+    fun getPeopleDetail(
+        @Path("id") id: Int,
+        @Query("api_key") Authorization : String,
+        @Query("language") lang: String,
+        @Query("page") page: Int,
+    ): Call<PeopleDetailResponse>
 }

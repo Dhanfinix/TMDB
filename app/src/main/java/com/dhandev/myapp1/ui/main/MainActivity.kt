@@ -1,4 +1,4 @@
-package com.dhandev.myapp1
+package com.dhandev.myapp1.ui.main
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -7,13 +7,22 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.dhandev.myapp1.LoginActivity
+import com.dhandev.myapp1.R
+import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.data.source.local.room.AppDatabase
+import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityMainBinding
-import com.dhandev.myapp1.ui.favorite.FavoriteActivity
+import com.dhandev.myapp1.ui.detail.DetailActivity
+import com.dhandev.myapp1.ui.watchlist.WatchlistActivity
+import com.dhandev.myapp1.ui.watchlist.WatchlistViewModel
 import com.dhandev.myapp1.ui.list.ListActivity
 import com.dhandev.myapp1.ui.people.PeopleActivity
 import kotlinx.coroutines.Dispatchers
@@ -22,13 +31,39 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: MainWatchListAdapter
+    private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var sharedPref: SharedPreferences
+    private val viewModel: WatchlistViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         sharedPref = getSharedPreferences(LoginActivity.USER_DATA, MODE_PRIVATE)
+
+        adapter = MainWatchListAdapter()
+        binding.rvWatchList.adapter = adapter
+
+        linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvWatchList.layoutManager = linearLayoutManager
+
+        adapter.delegate = object : MainWathcListDelegate {
+            override fun onItemClicked(selected: MovieEntity) {
+                val dataResult = ResultsItem(selected.overview, selected.originalTitle, selected.title, selected.releaseDate, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.id)
+                DetailActivity.open(this@MainActivity, "Movie Detail", dataResult)
+            }
+        }
+        viewModel.getFav(this)
+        viewModel.data.observe(this) {
+            if (it.isEmpty()) {
+                binding.tvNotFound.visibility = View.VISIBLE
+            } else {
+                binding.tvNotFound.visibility = View.GONE
+            }
+            adapter.setAdapter(it.take(5))
+        }
 
         binding.apply {
             val query = searchBar.text
@@ -73,7 +108,15 @@ class MainActivity : AppCompatActivity() {
             btnPeoplePopular.setOnClickListener {
                 PeopleActivity.open(this@MainActivity, "Popular People")
             }
+            tvShowAll.setOnClickListener {
+                WatchlistActivity.open(this@MainActivity)
+            }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getFav(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -86,9 +129,6 @@ class MainActivity : AppCompatActivity() {
         when(item.itemId){
             R.id.logout -> {
                 showAlertLogout()
-            }
-            R.id.favorite -> {
-                FavoriteActivity.open(this)
             }
         }
         return super.onOptionsItemSelected(item)

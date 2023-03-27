@@ -1,4 +1,4 @@
-package com.dhandev.myapp1.ui.favorite
+package com.dhandev.myapp1.ui.watchlist
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -10,7 +10,7 @@ import com.dhandev.myapp1.data.source.local.room.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FavoriteViewModel: ViewModel() {
+class WatchlistViewModel: ViewModel() {
     private val _data = MutableLiveData<List<MovieEntity>>()
     val data : LiveData<List<MovieEntity>>
         get() = _data
@@ -18,6 +18,12 @@ class FavoriteViewModel: ViewModel() {
     fun getFav(context: Context){
         viewModelScope.launch(Dispatchers.IO) {
             _data.postValue(AppDatabase.getDatabase(context).movieDao().getAllFav())
+        }
+    }
+
+    fun delete(context: Context, data: MovieEntity){
+        viewModelScope.launch(Dispatchers.IO) {
+            AppDatabase.getDatabase(context).movieDao().deleteAll(data)
         }
     }
 }

@@ -1,7 +1,7 @@
-package com.dhandev.myapp1.ui.favorite
+package com.dhandev.myapp1.ui.main
 
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 
-interface FavoriteDelegate {
+interface MainWathcListDelegate {
     fun onItemClicked(selected: MovieEntity)
 }

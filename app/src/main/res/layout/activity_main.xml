@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/bottom"
-    tools:context=".MainActivity">
+    tools:context=".ui.main.MainActivity">
 
     <LinearLayout
         android:id="@+id/main_linear"
@@ -26,7 +26,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#32FFFFFF"
+            android:background="@color/semi_transparent"
             android:padding="16dp"
             android:orientation="vertical">
 
@@ -93,7 +93,6 @@
                     android:id="@+id/btn_mov_popular"
                     style="@style/main_btn_textView"
                     android:text="@string/popular"
-                    android:layout_marginEnd="10dp"
                     app:drawableTopCompat="@drawable/icons8_movie_ticket_50" />
 
             </LinearLayout>
@@ -162,16 +161,60 @@
                 <TextView
                     style="@style/main_btn_textView"
                     android:visibility="invisible"
+                    android:layout_height="match_parent"
                     android:layout_marginEnd="10dp"/>
                 <TextView
                     style="@style/main_btn_textView"
                     android:visibility="invisible"
+                    android:layout_height="match_parent"
                     android:layout_marginEnd="10dp"/>
                 <TextView
                     style="@style/main_btn_textView"
+                    android:layout_height="match_parent"
                     android:visibility="invisible"/>
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/your_watch_list"
+                    style="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/white"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="8dp"/>
+                <TextView
+                    android:id="@+id/tvShowAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/show_all"
+                    style="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="8dp"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tv_not_found"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_watch_list_added"
+                android:layout_marginVertical="16dp"
+                android:textAlignment="center"
+                android:textStyle="italic"
+                android:visibility="gone"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvWatchList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:layout_marginStart="-16dp"
+                android:layout_marginEnd="-16dp"
+                android:padding="8dp"/>
 
         </LinearLayout>
 
@@ -181,8 +224,8 @@
             android:text="@string/tdp_batch_3_android_session"
             android:layout_marginVertical="16dp"
             android:textAlignment="center"
-            style="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#FFFFFF"
+            style="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/semi_transparent"
             android:layout_marginBottom="8dp"/>
 
     </LinearLayout>

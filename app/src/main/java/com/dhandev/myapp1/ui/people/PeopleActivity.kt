@@ -15,6 +15,7 @@ import com.dhandev.myapp1.data.source.remote.network.ApiConfig
 import com.dhandev.myapp1.data.source.remote.response.PeopleResponse
 import com.dhandev.myapp1.data.source.remote.response.ResultsPeopleItem
 import com.dhandev.myapp1.databinding.ActivityPeopleBinding
+import com.dhandev.myapp1.ui.detail.people.PeopleDetailActivity
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import retrofit2.Call
@@ -45,7 +46,6 @@ class PeopleActivity : AppCompatActivity() {
             override fun onItemClicked(selected: ResultsPeopleItem) {
                 PeopleDetailActivity.open(this@PeopleActivity, "Detail", selected)
             }
-
         }
         skeleton = binding.rvList.applySkeleton(R.layout.list_row_people_item, 9)
 

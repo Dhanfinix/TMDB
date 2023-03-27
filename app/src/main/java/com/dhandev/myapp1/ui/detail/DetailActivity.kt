@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -20,6 +21,7 @@ import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityDetailBinding
+import com.dhandev.myapp1.ui.comment.CommentActivity
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.createSkeleton
 
@@ -36,12 +38,6 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         supportActionBar?.setHomeButtonEnabled(true)
         val isFav = intent.getBooleanExtra(FAVORITE, false)
-//        if (isFav){
-//            val dataFav = intent.getParcelableExtra(DETAIL_INFO, MovieEntity::class.java)
-//
-//            data = ResultsItem(dataFav?.overview, dataFav?.originalTitle, dataFav?.title, dataFav?.releaseDate, dataFav?.posterPath, dataFav?.backdropPath, dataFav?.voteAverage, dataFav?.id)
-//
-//        }
         data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (isFav){
                 dataFav()
@@ -134,14 +130,29 @@ class DetailActivity : AppCompatActivity() {
                 viewModel.getById(this@DetailActivity, data!!.id!!).observe(this@DetailActivity){ movieEntity ->
                     val detailData = MovieEntity(data?.overview, data?.originalTitle, data?.title, data?.releaseDate, data?.posterPath, data?.backdropPath, data?.voteAverage, data?.id)
                     if (movieEntity==null){
-                        Toast.makeText(this@DetailActivity, getString(R.string.added_to_favorite), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DetailActivity, getString(R.string.added_to_watchlist), Toast.LENGTH_SHORT).show()
                         data?.let { viewModel.insertFav(this@DetailActivity, detailData) }
                         btnFav.text = getString(R.string.remove_watchlist)
                     } else {
                         data?.let { viewModel.delete(this@DetailActivity, detailData) }
-                        Toast.makeText(this@DetailActivity, getString(R.string.removed_from_fav), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DetailActivity, getString(R.string.removed_from_watch_list), Toast.LENGTH_SHORT).show()
                         btnFav.text = getString(R.string.add_to_watch_list)
                     }
+                }
+            }
+
+            btnAddReview.setOnClickListener {
+                CommentActivity.openNew(this@DetailActivity, data?.id!!)
+            }
+
+            data?.id?.let { viewModel.getCommentById(this@DetailActivity, it).observe(this@DetailActivity){ result ->
+                if(result == null){
+                    noCommentsFound.text = getString(R.string.no_comments_available)
+                    noCommentsFound.visibility = View.VISIBLE
+                } else {
+                    noCommentsFound.text = getString(R.string.lorem)
+                    noCommentsFound.visibility = View.GONE
+                }
                 }
             }
 

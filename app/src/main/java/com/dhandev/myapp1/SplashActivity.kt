@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.dhandev.myapp1.ui.main.MainActivity
 
 
 @SuppressLint("CustomSplashScreen")
