@@ -167,6 +167,7 @@ class DetailActivity : AppCompatActivity() {
                 if(result == null || result.isEmpty()){
                     noCommentsFound.text = getString(R.string.no_comments_available)
                     noCommentsFound.visibility = View.VISIBLE
+                    binding.rvComment.isVisible = false
                 } else {
                     noCommentsFound.text = getString(R.string.lorem)
                     noCommentsFound.visibility = View.GONE
