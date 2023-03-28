@@ -1,16 +1,22 @@
 package com.dhandev.myapp1.ui.detail
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.dhandev.myapp1.data.source.local.entity.CommentEntity
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.data.source.local.room.AppDatabase
+import com.dhandev.myapp1.data.source.local.room.CommentDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DetailViewModel: ViewModel() {
+    private val _movieTvId = MutableLiveData<MovieEntity>()
+    val movieTvId : LiveData<MovieEntity>
+        get() = _movieTvId
+
+    private val _commentById = MutableLiveData<List<CommentEntity>>()
+    val commentById : LiveData<List<CommentEntity>>
+        get() = _commentById
 
     fun insertFav(context: Context, data: MovieEntity){
         viewModelScope.launch(Dispatchers.IO) {
@@ -18,12 +24,10 @@ class DetailViewModel: ViewModel() {
         }
     }
 
-    fun getById(context: Context, id: Int): LiveData<MovieEntity> {
-        val result = MutableLiveData<MovieEntity>()
-        viewModelScope.launch(Dispatchers.IO) {
-            result.postValue(AppDatabase.getDatabase(context).movieDao().getById(id))
+    fun getById(context: Context, owner: LifecycleOwner, id: Int){
+        AppDatabase.getDatabase(context).movieDao().getById(id).observe(owner){result->
+            _movieTvId.postValue(result)
         }
-        return result
     }
 
     fun delete(context: Context, data: MovieEntity){
@@ -33,13 +37,9 @@ class DetailViewModel: ViewModel() {
     }
 
     //COMMENT
-//    fun getCommentById(context: Context, id: Int): LiveData<List<CommentEntity>> {
-//        val result = MutableLiveData<List<CommentEntity>>()
-//        viewModelScope.launch(Dispatchers.IO) {
-//            CommentDatabase.getDatabase(context).commentDao().getById(id).observe(, Observer<List<CommentEntity>>()){
-//
-//            }
-//        }
-//        return result
-//    }
+    fun getCommentById(context: Context, owner: LifecycleOwner, id: Int) {
+        CommentDatabase.getDatabase(context).commentDao().getById(id).observe(owner) { result ->
+            _commentById.postValue(result)
+        }
+    }
 }

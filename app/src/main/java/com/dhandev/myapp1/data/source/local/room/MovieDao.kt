@@ -1,5 +1,6 @@
 package com.dhandev.myapp1.data.source.local.room
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -15,7 +16,7 @@ interface MovieDao {
     fun getAllFav(): List<MovieEntity>
 
     @Query("SELECT * FROM movies WHERE id=:ids")
-    fun getById(ids:Int): MovieEntity
+    fun getById(ids:Int): LiveData<MovieEntity>
 
     @Delete
     fun deleteAll(data: MovieEntity)

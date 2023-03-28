@@ -23,7 +23,6 @@ import com.bumptech.glide.request.target.Target
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.CommentEntity
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
-import com.dhandev.myapp1.data.source.local.room.CommentDatabase
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityDetailBinding
 import com.dhandev.myapp1.ui.comment.CommentActivity
@@ -137,23 +136,20 @@ class DetailActivity : AppCompatActivity() {
             tvRating.text = getString(R.string.rating, data?.voteAverage.toString())
             tvOverview.text = data?.overview
 
-            data?.let { viewModel.getById(this@DetailActivity, it.id!!) }?.observe(this@DetailActivity){ resultItem->
+            viewModel.getById(this@DetailActivity, this@DetailActivity, data?.id!!)
+
+            val detailData = MovieEntity(data?.overview, data?.originalTitle, data?.title, data?.releaseDate, data?.posterPath, data?.backdropPath, data?.voteAverage, data?.id)
+            viewModel.movieTvId.observe(this@DetailActivity){ resultItem->
                 if(resultItem == null){
                     btnFav.text = getString(R.string.add_to_watch_list)
-
-                } else {
-                    btnFav.text = getString(R.string.remove_watchlist)
-                }
-            }
-
-            btnFav.setOnClickListener {
-                viewModel.getById(this@DetailActivity, data!!.id!!).observe(this@DetailActivity){ movieEntity ->
-                    val detailData = MovieEntity(data?.overview, data?.originalTitle, data?.title, data?.releaseDate, data?.posterPath, data?.backdropPath, data?.voteAverage, data?.id)
-                    if (movieEntity==null){
+                    btnFav.setOnClickListener {
                         Toast.makeText(this@DetailActivity, getString(R.string.added_to_watchlist), Toast.LENGTH_SHORT).show()
                         data?.let { viewModel.insertFav(this@DetailActivity, detailData) }
                         btnFav.text = getString(R.string.remove_watchlist)
-                    } else {
+                    }
+                } else {
+                    btnFav.text = getString(R.string.remove_watchlist)
+                    btnFav.setOnClickListener {
                         data?.let { viewModel.delete(this@DetailActivity, detailData) }
                         Toast.makeText(this@DetailActivity, getString(R.string.removed_from_watch_list), Toast.LENGTH_SHORT).show()
                         btnFav.text = getString(R.string.add_to_watch_list)
@@ -165,7 +161,8 @@ class DetailActivity : AppCompatActivity() {
                 CommentActivity.openNew(this@DetailActivity, data?.id!!)
             }
 
-            CommentDatabase.getDatabase(this@DetailActivity).commentDao().getById(data?.id!!).observe(this@DetailActivity
+            viewModel.getCommentById(this@DetailActivity, this@DetailActivity, data?.id!!)
+            viewModel.commentById.observe(this@DetailActivity
             ) { result ->
                 if(result == null || result.isEmpty()){
                     noCommentsFound.text = getString(R.string.no_comments_available)
