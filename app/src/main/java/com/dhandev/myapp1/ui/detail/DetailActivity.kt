@@ -26,6 +26,7 @@ import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityDetailBinding
 import com.dhandev.myapp1.ui.comment.CommentActivity
+import com.dhandev.myapp1.utils.uiUtil
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.createSkeleton
 
@@ -79,6 +80,7 @@ class DetailActivity : AppCompatActivity() {
             skeletonPoster = ivPoster.createSkeleton()
             skeleton.showSkeleton()
             skeletonPoster.showSkeleton()
+
             Glide.with(this@DetailActivity)
                 .load("https://image.tmdb.org/t/p/original${data?.backdropPath}")
                 .listener(object : RequestListener<Drawable?> {

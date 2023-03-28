@@ -16,6 +16,7 @@ import com.dhandev.myapp1.data.source.remote.response.PeopleResponse
 import com.dhandev.myapp1.data.source.remote.response.ResultsPeopleItem
 import com.dhandev.myapp1.databinding.ActivityPeopleBinding
 import com.dhandev.myapp1.ui.detail.people.PeopleDetailActivity
+import com.dhandev.myapp1.utils.uiUtil
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import retrofit2.Call
@@ -50,6 +51,7 @@ class PeopleActivity : AppCompatActivity() {
         skeleton = binding.rvList.applySkeleton(R.layout.list_row_people_item, 9)
 
         skeleton.showSkeleton()
+        val loading = uiUtil().showLoading(this)
         ApiConfig.getApiService()
             .getPeople(BuildConfig.API_KEY, "en-US", 1)
             .enqueue(object : Callback<PeopleResponse> {
@@ -62,6 +64,7 @@ class PeopleActivity : AppCompatActivity() {
                         adapter.setAdapter(peopleData)
                         binding.rvList.isVisible = peopleData.isNotEmpty()
                         skeleton.showOriginal()
+                        loading.dismiss()
                     } else {
                         Log.e("TAG", "onFailure: ${response.message()}")
                     }

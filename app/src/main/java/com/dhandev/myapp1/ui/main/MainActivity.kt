@@ -4,10 +4,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import android.view.View.OnTouchListener
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -21,10 +19,10 @@ import com.dhandev.myapp1.data.source.local.room.AppDatabase
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityMainBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
-import com.dhandev.myapp1.ui.watchlist.WatchlistActivity
-import com.dhandev.myapp1.ui.watchlist.WatchlistViewModel
 import com.dhandev.myapp1.ui.list.ListActivity
 import com.dhandev.myapp1.ui.people.PeopleActivity
+import com.dhandev.myapp1.ui.watchlist.WatchlistActivity
+import com.dhandev.myapp1.ui.watchlist.WatchlistViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -78,6 +76,25 @@ class MainActivity : AppCompatActivity() {
                 }
                 return@setOnKeyListener true
             }
+
+            searchBar.setOnTouchListener(OnTouchListener { v, event ->
+                val DRAWABLE_LEFT = 0
+                val DRAWABLE_TOP = 1
+                val DRAWABLE_RIGHT = 2
+                val DRAWABLE_BOTTOM = 3
+                if (event.action == MotionEvent.ACTION_UP) {
+                    if (event.rawX >= searchBar.right - searchBar.compoundDrawables[DRAWABLE_RIGHT].bounds.width()
+                    ) {
+                        if (query.isEmpty() || query.toString() == ""){
+                            Toast.makeText(this@MainActivity, "Please input keyword", Toast.LENGTH_SHORT).show()
+                        } else {
+                            ListActivity.openSearch(this@MainActivity, "Result of \"$query\"", "search/movie", query.toString())
+                        }
+                        return@OnTouchListener true
+                    }
+                }
+                false
+            })
 
             btnMovTop.setOnClickListener {
                 ListActivity.open(this@MainActivity, "Top Rated Movies", "movie/top_rated")

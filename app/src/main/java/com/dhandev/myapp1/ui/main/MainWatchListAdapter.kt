@@ -40,6 +40,7 @@ class MainWatchListAdapter: RecyclerView.Adapter<PeopleMovieViewHolder>() {
     fun setAdapter(movies: List<MovieEntity>) {
         list.clear()
         list.addAll(movies)
+        println("HALO $movies")
         notifyDataSetChanged()
     }
 

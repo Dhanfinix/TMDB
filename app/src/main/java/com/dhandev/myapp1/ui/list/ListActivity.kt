@@ -1,5 +1,6 @@
 package com.dhandev.myapp1.ui.list
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +18,7 @@ import com.dhandev.myapp1.data.source.remote.response.MovieTvResponse
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityListBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
+import com.dhandev.myapp1.utils.uiUtil
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import retrofit2.Call
@@ -30,7 +32,6 @@ class ListActivity : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     private var path = ""
     private var query = ""
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListBinding.inflate(layoutInflater)
@@ -57,6 +58,7 @@ class ListActivity : AppCompatActivity() {
         skeleton = binding.rvList.applySkeleton(R.layout.list_row_item, 6)
 
         skeleton.showSkeleton()
+        val loading = uiUtil().showLoading(this)
         ApiConfig.getApiService()
             .getMovies(path, BuildConfig.API_KEY, "en-US", 1, query)
             .enqueue(object : Callback<MovieTvResponse> {
@@ -69,14 +71,17 @@ class ListActivity : AppCompatActivity() {
                         adapter.setAdapter(movieData)
                         binding.rvList.isVisible = movieData.isNotEmpty()
                         skeleton.showOriginal()
+                        loading.dismiss()
                         if (movieData.isEmpty()){
                             binding.notFound.visibility = View.VISIBLE
                         }
                     } else {
+                        showAlert(response.message())
                         Log.e("TAG", "onFailure: ${response.message()}")
                     }
                 }
                 override fun onFailure(call: Call<MovieTvResponse>, t: Throwable) {
+                    showAlert(t.message!!)
                     Log.d("Failure", t.message!!)
                 }
             })
@@ -84,11 +89,26 @@ class ListActivity : AppCompatActivity() {
 
     }
 
+    private fun showAlert(message: String) {
+        // Create an alert builder
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setTitle("Warning")
+        builder.setMessage(message)
 
-//
-//    private fun showDataFav() {
-//
-//    }
+        // add a button
+        builder.setNegativeButton("Back") { _, _ ->
+            onBackPressedDispatcher.onBackPressed()
+        }
+        builder.setPositiveButton("Retry") { _, _ ->
+            val mIntent = intent
+            finish()
+            startActivity(mIntent)
+        }
+
+        // create and show the alert dialog
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
 
     //overide back button pada action bar dengan onBackPressed, karena defaultnya seperti merestart activity
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

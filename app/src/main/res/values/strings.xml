@@ -51,5 +51,6 @@
     <string name="please_fill_your_name">Please fill your name…</string>
     <string name="submit">Submit</string>
     <string name="delete">Delete</string>
+    <string name="loading_data">Loading Data</string>
 </resources>
 
