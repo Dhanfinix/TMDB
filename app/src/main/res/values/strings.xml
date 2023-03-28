@@ -32,8 +32,8 @@
     <string name="favorite">Favorite</string>
     <string name="remove_fav">Remove Favorite</string>
     <string name="remove_watchlist">Remove Watch List</string>
-    <string name="added_to_watchlist">Added to Watch List</string>
-    <string name="removed_from_watch_list">Removed from Watch List</string>
+    <string name="added_to_watchlist">Success add to watch list</string>
+    <string name="removed_from_watch_list">Removed from watch list</string>
     <string name="title">Title</string>
     <string name="release_date">20-12-2001</string>
     <string name="add_to_watch_list">Add to Watch List</string>
@@ -52,5 +52,6 @@
     <string name="submit">Submit</string>
     <string name="delete">Delete</string>
     <string name="loading_data">Loading Data</string>
+    <string name="sas">Success add to watch list</string>
 </resources>
 

@@ -1,7 +1,6 @@
 package com.dhandev.myapp1.ui.main
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -11,12 +10,10 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dhandev.myapp1.LoginActivity
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
-import com.dhandev.myapp1.data.source.local.room.AppDatabase
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityMainBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
@@ -24,8 +21,7 @@ import com.dhandev.myapp1.ui.list.ListActivity
 import com.dhandev.myapp1.ui.people.PeopleActivity
 import com.dhandev.myapp1.ui.watchlist.WatchlistActivity
 import com.dhandev.myapp1.ui.watchlist.WatchlistViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.dhandev.myapp1.utils.UiUtils
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                 DetailActivity.open(this@MainActivity, "Movie Detail", dataResult)
             }
         }
-        viewModel.getFav(this)
+        viewModel.getFav(this, this)
         viewModel.data.observe(this) {
             if (it.isEmpty()) {
                 binding.tvNotFound.visibility = View.VISIBLE
@@ -131,11 +127,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.getFav(this)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -145,32 +136,41 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.logout -> {
-                showAlertLogout()
+                UiUtils().showAlert(this, "Logout", "Are you sure to logout?", "Yes", "No",
+                {
+                    sharedPref.edit().clear().apply()
+                    viewModel.clearDatabase(this)
+                    LoginActivity.open(this)
+                    finish()
+                }, {
+                    it.dismiss()
+                })
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showAlertLogout() {
-        // Create an alert builder
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle("Logout")
-        builder.setMessage("Are you sure to logout?")
-
-        // add a button
-        builder.setPositiveButton("Yes") { _, _ ->
-            sharedPref.edit().clear().apply()
-            lifecycleScope.launch(Dispatchers.IO) {
-                AppDatabase.getDatabase(this@MainActivity).clearAllTables()
-            }
-            LoginActivity.open(this)
-            finish()
-        }
-
-        // create and show the alert dialog
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
-    }
+//    private fun showAlertLogout(context: Context, title: String, message: String, PositiveCallback: () -> Unit, NegativeCallback: () -> Unit) {
+//        // Create an alert builder
+//        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+//        builder.setTitle("Logout")
+//        builder.setMessage("Are you sure to logout?")
+//
+//        var dialog: AlertDialog? = null
+//
+//        // add a button
+//        builder.setPositiveButton("Yes") { _, _ ->
+//            sharedPref.edit().clear().apply()
+//            viewModel.clearDatabase(this)
+//            LoginActivity.open(this)
+//            finish()
+//        }
+//        builder.setNegativeButton("No") { _, _ ->
+//            dialog?.dismiss()
+//        }
+//        dialog = builder.create()
+//        dialog?.show()
+//    }
 
     companion object{
         fun open(activity: AppCompatActivity){

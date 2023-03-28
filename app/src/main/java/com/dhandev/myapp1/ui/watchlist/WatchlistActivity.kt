@@ -11,17 +11,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
-import com.dhandev.myapp1.databinding.ActivityFavoriteBinding
+import com.dhandev.myapp1.databinding.ActivityWatchlistBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
+import com.dhandev.myapp1.utils.UiUtils
 
 class WatchlistActivity : AppCompatActivity() {
     private lateinit var adapter: WatchlistAdapter
-    private lateinit var binding: ActivityFavoriteBinding
+    private lateinit var binding: ActivityWatchlistBinding
     private val viewModel: WatchlistViewModel by viewModels()
+    private val uiUtil = UiUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityFavoriteBinding.inflate(layoutInflater)
+        binding = ActivityWatchlistBinding.inflate(layoutInflater)
         setContentView(binding.root)
         title = getString(R.string.my_watch_list)
 
@@ -38,11 +40,13 @@ class WatchlistActivity : AppCompatActivity() {
 
             override fun onItemDeleted(selected: MovieEntity) {
                 viewModel.delete(this@WatchlistActivity, selected)
-                viewModel.getFav(this@WatchlistActivity)
+                uiUtil.showSnackBar(this@WatchlistActivity, binding.root, getString(R.string.removed_from_watch_list)){
+                    viewModel.insertFav(this@WatchlistActivity, selected)
+                }
             }
         }
 
-        viewModel.getFav(this)
+        viewModel.getFav(this, this)
         viewModel.data.observe(this) {
             if (it.isEmpty()) {
                 binding.notFound.visibility = View.VISIBLE
@@ -51,11 +55,6 @@ class WatchlistActivity : AppCompatActivity() {
             }
             adapter.setAdapter(it)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.getFav(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

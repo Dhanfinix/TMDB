@@ -25,9 +25,9 @@ import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityDetailBinding
 import com.dhandev.myapp1.ui.comment.CommentActivity
+import com.dhandev.myapp1.utils.UiUtils
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.createSkeleton
-import com.google.android.material.snackbar.Snackbar
 
 
 class DetailActivity : AppCompatActivity() {
@@ -37,6 +37,7 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var adapter : DetailCommentListAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val viewModel : DetailViewModel by viewModels()
+    private val uiUtil = UiUtils()
 //    private lateinit var db : AppDatabase
     private var data : ResultsItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,9 +145,8 @@ class DetailActivity : AppCompatActivity() {
                 if(resultItem == null){
                     btnFav.text = getString(R.string.add_to_watch_list)
                     btnFav.setOnClickListener {
-//                        Toast.makeText(this@DetailActivity, getString(R.string.added_to_watchlist), Toast.LENGTH_SHORT).show()
                         data?.let { viewModel.insertFav(this@DetailActivity, detailData) }
-                        showSnackbar("Success add to watch list"){
+                        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.added_to_watchlist)){
                             viewModel.delete(this@DetailActivity, detailData)
                         }
                         btnFav.text = getString(R.string.remove_watchlist)
@@ -155,8 +155,7 @@ class DetailActivity : AppCompatActivity() {
                     btnFav.text = getString(R.string.remove_watchlist)
                     btnFav.setOnClickListener {
                         data?.let { viewModel.delete(this@DetailActivity, detailData) }
-//                        Toast.makeText(this@DetailActivity, getString(R.string.removed_from_watch_list), Toast.LENGTH_SHORT).show()
-                        showSnackbar("Success remove the watch list"){
+                        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.removed_from_watch_list)){
                             viewModel.insertFav(this@DetailActivity, detailData)
                         }
                         btnFav.text = getString(R.string.add_to_watch_list)
@@ -186,16 +185,16 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun showSnackbar(message: String, myCallback: () -> Unit) {
-        return Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
-            .setAction("Undo") {
-                myCallback.invoke()
-            }
-            .setBackgroundTint(getColor(R.color.white))
-            .setTextColor(getColor(R.color.black))
-            .setActionTextColor(getColor(R.color.green_500))
-            .show()
-    }
+//    private fun showSnackBar(message: String, myCallback: () -> Unit) {
+//        return Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+//            .setAction("Undo") {
+//                myCallback.invoke()
+//            }
+//            .setBackgroundTint(getColor(R.color.white))
+//            .setTextColor(getColor(R.color.black))
+//            .setActionTextColor(getColor(R.color.green_500))
+//            .show()
+//    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun dataFav() : ResultsItem{

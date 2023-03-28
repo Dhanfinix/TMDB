@@ -19,7 +19,7 @@ import com.dhandev.myapp1.data.source.remote.response.ResultsPeopleItem
 import com.dhandev.myapp1.databinding.ActivityPeopleDetailBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
 import com.dhandev.myapp1.utils.dateUtil
-import com.dhandev.myapp1.utils.uiUtil
+import com.dhandev.myapp1.utils.UiUtils
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.faltenreich.skeletonlayout.createSkeleton
@@ -67,7 +67,7 @@ class PeopleDetailActivity : AppCompatActivity() {
         skeletonRv = binding.rvKnownFor.applySkeleton(R.layout.list_row_people_item, 5)
         skeleton.showSkeleton()
         skeletonBio.showSkeleton()
-        val loading = uiUtil().showLoading(this)
+        val loading = UiUtils().showLoading(this)
 
         ApiConfig.getApiService()
             .getPeopleDetail(data?.id!!, BuildConfig.API_KEY, "en-US", 1)
