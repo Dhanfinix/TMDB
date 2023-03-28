@@ -23,6 +23,7 @@ import com.bumptech.glide.request.target.Target
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.CommentEntity
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
+import com.dhandev.myapp1.data.source.local.room.CommentDatabase
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityDetailBinding
 import com.dhandev.myapp1.ui.comment.CommentActivity
@@ -164,8 +165,8 @@ class DetailActivity : AppCompatActivity() {
                 CommentActivity.openNew(this@DetailActivity, data?.id!!)
             }
 
-            data?.id?.let { viewModel.getCommentById(this@DetailActivity, it).observe(this@DetailActivity){ result ->
-
+            CommentDatabase.getDatabase(this@DetailActivity).commentDao().getById(data?.id!!).observe(this@DetailActivity
+            ) { result ->
                 if(result == null || result.isEmpty()){
                     noCommentsFound.text = getString(R.string.no_comments_available)
                     noCommentsFound.visibility = View.VISIBLE
@@ -174,7 +175,6 @@ class DetailActivity : AppCompatActivity() {
                     noCommentsFound.visibility = View.GONE
                     adapter.setAdapter(result)
                     binding.rvComment.isVisible = result.isNotEmpty()
-                }
                 }
             }
 

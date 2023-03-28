@@ -1,5 +1,6 @@
 package com.dhandev.myapp1.data.source.local.room
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -15,7 +16,7 @@ interface CommentDao {
     fun getAllComment(): List<CommentEntity>
 
     @Query("SELECT * FROM comment WHERE movie_id = :movie_id")
-    fun getById(movie_id:Int): List<CommentEntity>
+    fun getById(movie_id:Int): LiveData<List<CommentEntity>>
 
     @Delete
     fun deleteAll(data: CommentEntity)

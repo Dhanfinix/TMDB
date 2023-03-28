@@ -23,7 +23,7 @@ class CommentActivity : AppCompatActivity() {
         title = getString(R.string.comment)
 
         val movieTvId = intent.getIntExtra(MOVIETV_ID, 0)
-
+        // TODO: UPDATE DELETE COMMENT
         binding.apply {
 
             btnComment.setOnClickListener {
