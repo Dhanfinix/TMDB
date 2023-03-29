@@ -1,46 +1,60 @@
 package com.dhandev.myapp1.ui.list
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
+import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
-import com.dhandev.myapp1.BuildConfig
 import com.dhandev.myapp1.R
-import com.dhandev.myapp1.data.source.remote.network.ApiConfig
-import com.dhandev.myapp1.data.source.remote.response.MovieTvResponse
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityListBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
 import com.dhandev.myapp1.utils.UiUtils
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class ListActivity : AppCompatActivity() {
     private lateinit var adapter: MovieListAdapter
     private lateinit var binding: ActivityListBinding
     private lateinit var skeleton: Skeleton
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private val viewModel : ListViewModel by viewModels()
     private var path = ""
     private var query = ""
+    private lateinit var loading : Dialog
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListBinding.inflate(layoutInflater)
-        supportActionBar?.setHomeButtonEnabled(true)
-        title = intent.getStringExtra(LIST_TITLE)
+        // Calling the support action bar and setting it to custom
+        this.supportActionBar!!.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+
+        // Displaying the custom layout in the ActionBar
+        supportActionBar!!.setDisplayShowCustomEnabled(true)
+        supportActionBar!!.setCustomView(R.layout.custom_action_bar)
+
+        val tvTitle = findViewById<TextView>(R.id.tvTitle)
+        val tvBack = findViewById<TextView>(R.id.tvBack)
+
+        tvTitle.text = intent.getStringExtra(LIST_TITLE)
+        tvBack.text = getString(R.string.home)
+        tvBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
         setContentView(binding.root)
 
         //get path for endpoint
         path = intent.getStringExtra(FETCH_PATH) ?: "movie/top_rated"
-        query = intent.getStringExtra(QUERY) ?: "A"
+        query = intent.getStringExtra(QUERY) ?: ""
 
         adapter = MovieListAdapter()
         binding.rvList.adapter = adapter
@@ -50,56 +64,59 @@ class ListActivity : AppCompatActivity() {
 
         adapter.delegate = object : MovieDelegate {
             override fun onItemClicked(selected: ResultsItem) {
-                DetailActivity.open(this@ListActivity, "Detail", selected)
+                DetailActivity.open(this@ListActivity, "Detail", intent.getStringExtra(LIST_TITLE) ?: "List", selected)
             }
 
         }
         skeleton = binding.rvList.applySkeleton(R.layout.list_row_item, 6)
 
-        skeleton.showSkeleton()
-        val loading = UiUtils().showLoading(this)
-        ApiConfig.getApiService()
-            .getMovies(path, BuildConfig.API_KEY, "en-US", 1, query)
-            .enqueue(object : Callback<MovieTvResponse> {
-                override fun onResponse(
-                    call: Call<MovieTvResponse>,
-                    response: Response<MovieTvResponse>
-                ) {
-                    if (response.isSuccessful && response.body() != null) {
-                        val movieData = response.body()!!.results!!
-                        adapter.setAdapter(movieData)
-                        binding.rvList.isVisible = movieData.isNotEmpty()
-                        skeleton.showOriginal()
-                        loading.dismiss()
-                        if (movieData.isEmpty()){
-                            binding.notFound.visibility = View.VISIBLE
-                        }
-                    } else {
-                        showAlert(response.message())
-                        Log.e("TAG", "onFailure: ${response.message()}")
-                    }
-                }
-                override fun onFailure(call: Call<MovieTvResponse>, t: Throwable) {
-                    showAlert(t.message!!)
-                    Log.d("Failure", t.message!!)
-                }
-            })
 
+        //get data from API
+        getData()
+
+        binding.swipeToRefresh.setOnRefreshListener {
+            //disable inherited loading of swipe layout
+            binding.swipeToRefresh.isRefreshing = false
+            //get data from API
+            getData()
+        }
 
     }
 
+    private fun getData() {
+        //show shimmering/skeleton and loading popup
+        skeleton.showSkeleton()
+        loading = UiUtils().showLoading(this)
+
+        //get data by calling it from view model, pass path(endpoint), query(for search),
+        // and add callback and error
+        viewModel.getData(path, query){errorMsg->
+                showAlert(errorMsg)
+        }
+        //observe fetched data from previous function
+        viewModel.movieTvData.observe(this){movieData->
+            adapter.setAdapter(movieData)
+            binding.rvList.isVisible = movieData.isNotEmpty()
+            skeleton.showOriginal()
+            loading.dismiss()
+            if (movieData.isEmpty()){
+                binding.notFound.visibility = View.VISIBLE
+            }
+        }
+    }
+
     private fun showAlert(message: String) {
+        //show alert by creating showAlert instance from UiUtils, pass needed parameters, and add callback
+        //for positive and negative button
         UiUtils().showAlert(this, "Warning", message, "Retry", "Back",
             {
-                val mIntent = intent
-                finish()
-                startActivity(mIntent)
+                getData()
             }, {
                 onBackPressedDispatcher.onBackPressed()
             })
     }
 
-    //overide back button pada action bar dengan onBackPressed, karena defaultnya seperti merestart activity
+    //overide back button on action bar with onBackPressed, because the default swipe to opposite direction
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
         if(item.itemId == android.R.id.home){

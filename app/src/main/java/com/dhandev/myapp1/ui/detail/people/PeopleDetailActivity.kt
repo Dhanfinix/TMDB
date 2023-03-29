@@ -2,30 +2,26 @@ package com.dhandev.myapp1.ui.detail.people
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
+import android.widget.TextView
+import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.dhandev.myapp1.BuildConfig
 import com.dhandev.myapp1.R
-import com.dhandev.myapp1.data.source.remote.network.ApiConfig
 import com.dhandev.myapp1.data.source.remote.response.KnownForItem
-import com.dhandev.myapp1.data.source.remote.response.PeopleDetailResponse
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.data.source.remote.response.ResultsPeopleItem
 import com.dhandev.myapp1.databinding.ActivityPeopleDetailBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
-import com.dhandev.myapp1.utils.dateUtil
 import com.dhandev.myapp1.utils.UiUtils
+import com.dhandev.myapp1.utils.dateUtil
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.faltenreich.skeletonlayout.createSkeleton
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class PeopleDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPeopleDetailBinding
@@ -34,15 +30,30 @@ class PeopleDetailActivity : AppCompatActivity() {
     private lateinit var skeletonRv: Skeleton
     private lateinit var adapter: PeopleMovieListAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private val viewModel : PeopleDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPeopleDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        supportActionBar?.setHomeButtonEnabled(true)
+
+        // Calling the support action bar and setting it to custom
+        this.supportActionBar!!.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+
+        // Displaying the custom layout in the ActionBar
+        supportActionBar!!.setDisplayShowCustomEnabled(true)
+        supportActionBar!!.setCustomView(R.layout.custom_action_bar)
+
+        val tvTitle = findViewById<TextView>(R.id.tvTitle)
+        val tvBack = findViewById<TextView>(R.id.tvBack)
 
         val data = intent.getParcelableExtra<ResultsPeopleItem>(DETAIL_INFO)
-        title = data?.name
+        tvTitle.text = data?.name
+        tvBack.text = getString(R.string.popular_people)
+        tvBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
+        setContentView(binding.root)
 
         adapter = PeopleMovieListAdapter()
         binding.rvKnownFor.adapter = adapter
@@ -55,7 +66,7 @@ class PeopleDetailActivity : AppCompatActivity() {
                 val title = selected.originalTitle ?: selected.originalName.toString()
                 val release = selected.releaseDate ?: selected.firstAirDate.toString()
                 val dataResult = ResultsItem(selected.overview, title, selected.title, release, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.id)
-                DetailActivity.open(this@PeopleDetailActivity, "Movie Detail", dataResult)
+                DetailActivity.open(this@PeopleDetailActivity, "Movie Detail", data?.name!!, dataResult)
             }
         }
         adapter.setAdapter(data?.knownFor!!)
@@ -65,54 +76,62 @@ class PeopleDetailActivity : AppCompatActivity() {
         skeleton = binding.mainInfo.createSkeleton()
         skeletonBio = binding.tvBio.createSkeleton()
         skeletonRv = binding.rvKnownFor.applySkeleton(R.layout.list_row_people_item, 5)
+
+        getData()
+
+    }
+
+    private fun getData() {
+        val data = intent.getParcelableExtra<ResultsPeopleItem>(DETAIL_INFO)
+
         skeleton.showSkeleton()
         skeletonBio.showSkeleton()
         val loading = UiUtils().showLoading(this)
 
-        ApiConfig.getApiService()
-            .getPeopleDetail(data?.id!!, BuildConfig.API_KEY, "en-US", 1)
-            .enqueue(object : Callback<PeopleDetailResponse> {
-                override fun onResponse(
-                    call: Call<PeopleDetailResponse>,
-                    response: Response<PeopleDetailResponse>
-                ) {
-                    if (response.isSuccessful && response.body() != null) {
-                        val peopleData = response.body()!!
-                        Glide.with(this@PeopleDetailActivity)
-                            .load("https://image.tmdb.org/t/p/original/${peopleData.profilePath}")
-                            .into(binding.ivProfile)
-                        binding.tvName.text = peopleData.name
-                        val gender = if(peopleData.gender == 2) "Male" else "Female"
-                        binding.tvAct.text = "$gender, ${peopleData.knownForDepartment}"
+        viewModel.getData(data?.id!!){
+            showAlert(it)
+        }
+        viewModel.peopleDetailData.observe(this){peopleData->
+            Glide.with(this)
+                .load("https://image.tmdb.org/t/p/original/${peopleData.profilePath}")
+                .into(binding.ivProfile)
+            binding.tvName.text = peopleData.name
+            val gender = if(peopleData.gender == 2) "Male" else "Female"
+            binding.tvAct.text = "$gender, ${peopleData.knownForDepartment}"
 
-                        val birthDate = peopleData.birthday?.split("-")
-                        val year = birthDate?.get(0)
-                        val month = birthDate?.get(1)
-                        val day = birthDate?.get(2)
-                        val deathDate = peopleData.deathday?.split("-")
-                        val yearDeath = deathDate?.get(0)
-                        val monthDeath = deathDate?.get(1)
-                        val dayDeath = deathDate?.get(2)
-                        if (birthDate != null && peopleData.deathday == null) {
-                            binding.tvBirthday.text = "${peopleData.birthday} (${dateUtil().getDate(year!!, month!!, day!!)} years old)"
-                        } else if (peopleData.deathday != null){
-                            binding.tvBirthday.text = "${peopleData.birthday} (Death at ${dateUtil().getDeathDate(year!!, month!!, day!!, yearDeath!!, monthDeath!!, dayDeath!!)} years old)"
-                        }
-                        binding.tvLoc.text = peopleData.placeOfBirth
-                        binding.tvKnownAs.text = peopleData.alsoKnownAs?.joinToString(",")
-                        binding.tvBio.text = peopleData.biography
-                        skeleton.showOriginal()
-                        skeletonBio.showOriginal()
-                        loading.dismiss()
-                    } else {
-                        Log.e("TAG", "onFailure: ${response.message()}")
-                    }
-                }
-                override fun onFailure(call: Call<PeopleDetailResponse>, t: Throwable) {
-                    Log.d("Failure", t.message!!)
-                }
+            val birthDate = peopleData.birthday?.split("-")
+            val year = birthDate?.get(0)
+            val month = birthDate?.get(1)
+            val day = birthDate?.get(2)
+            val deathDate = peopleData.deathday?.split("-")
+            val yearDeath = deathDate?.get(0)
+            val monthDeath = deathDate?.get(1)
+            val dayDeath = deathDate?.get(2)
+            if (birthDate != null && peopleData.deathday == null) {
+                binding.tvBirthday.text = "${peopleData.birthday} (${dateUtil().getDate(year!!, month!!, day!!)} years old)"
+            } else if (peopleData.deathday != null){
+                binding.tvBirthday.text = "${peopleData.birthday} (Death at ${dateUtil().getDeathDate(year!!, month!!, day!!, yearDeath!!, monthDeath!!, dayDeath!!)} years old)"
+            }
+            binding.tvLoc.text = peopleData.placeOfBirth
+            binding.tvKnownAs.text = peopleData.alsoKnownAs?.joinToString(",")
+            binding.tvBio.text = peopleData.biography
+            skeleton.showOriginal()
+            skeletonBio.showOriginal()
+            loading.dismiss()
+        }
+    }
+
+    private fun showAlert(message: String){
+        //show alert by creating showAlert instance from UiUtils, pass needed parameters, and add callback
+        //for positive and negative button
+        UiUtils().showAlert(this, "Warning", message, "Retry", "Back",
+            {
+                getData()
+            }, {
+                onBackPressedDispatcher.onBackPressed()
             })
     }
+
     //overide back button pada action bar dengan onBackPressed, karena defaultnya seperti merestart activity
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)

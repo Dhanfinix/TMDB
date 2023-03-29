@@ -6,8 +6,10 @@ import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
@@ -28,6 +30,7 @@ import com.dhandev.myapp1.ui.comment.CommentActivity
 import com.dhandev.myapp1.utils.UiUtils
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.createSkeleton
+import com.google.android.material.snackbar.Snackbar
 
 
 class DetailActivity : AppCompatActivity() {
@@ -38,12 +41,27 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val viewModel : DetailViewModel by viewModels()
     private val uiUtil = UiUtils()
-//    private lateinit var db : AppDatabase
+
     private var data : ResultsItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
-        supportActionBar?.setHomeButtonEnabled(true)
+        // Calling the support action bar and setting it to custom
+        this.supportActionBar!!.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+
+        // Displaying the custom layout in the ActionBar
+        supportActionBar!!.setDisplayShowCustomEnabled(true)
+        supportActionBar!!.setCustomView(R.layout.custom_action_bar)
+
+        val tvTitle = findViewById<TextView>(R.id.tvTitle)
+        val tvBack = findViewById<TextView>(R.id.tvBack)
+
+        tvTitle.text = intent.getStringExtra(PAGE_TITLE)
+        tvBack.text = intent.getStringExtra(BEFORE)
+        tvBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
         setContentView(binding.root)
 
         adapter = DetailCommentListAdapter()
@@ -73,7 +91,6 @@ class DetailActivity : AppCompatActivity() {
                 intent.getParcelableExtra(DETAIL_INFO)
             }
         }
-        title = intent.getStringExtra(PAGE_TITLE)
 
         binding.apply {
             skeleton = ivBackdrop.createSkeleton()
@@ -90,6 +107,7 @@ class DetailActivity : AppCompatActivity() {
                         target: Target<Drawable?>?,
                         isFirstResource: Boolean
                     ): Boolean {
+                        retrySnackBar()
                         return false
                     }
 
@@ -116,6 +134,7 @@ class DetailActivity : AppCompatActivity() {
                         target: Target<Drawable?>?,
                         isFirstResource: Boolean
                     ): Boolean {
+                        retrySnackBar()
                         return false
                     }
 
@@ -146,7 +165,8 @@ class DetailActivity : AppCompatActivity() {
                     btnFav.text = getString(R.string.add_to_watch_list)
                     btnFav.setOnClickListener {
                         data?.let { viewModel.insertFav(this@DetailActivity, detailData) }
-                        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.added_to_watchlist)){
+                        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.added_to_watchlist), getString(
+                            R.string.undo), Snackbar.LENGTH_LONG){
                             viewModel.delete(this@DetailActivity, detailData)
                         }
                         btnFav.text = getString(R.string.remove_watchlist)
@@ -155,7 +175,8 @@ class DetailActivity : AppCompatActivity() {
                     btnFav.text = getString(R.string.remove_watchlist)
                     btnFav.setOnClickListener {
                         data?.let { viewModel.delete(this@DetailActivity, detailData) }
-                        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.removed_from_watch_list)){
+                        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.removed_from_watch_list), getString(
+                            R.string.undo), Snackbar.LENGTH_LONG){
                             viewModel.insertFav(this@DetailActivity, detailData)
                         }
                         btnFav.text = getString(R.string.add_to_watch_list)
@@ -185,16 +206,13 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-//    private fun showSnackBar(message: String, myCallback: () -> Unit) {
-//        return Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
-//            .setAction("Undo") {
-//                myCallback.invoke()
-//            }
-//            .setBackgroundTint(getColor(R.color.white))
-//            .setTextColor(getColor(R.color.black))
-//            .setActionTextColor(getColor(R.color.green_500))
-//            .show()
-//    }
+    private fun retrySnackBar() {
+        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.image_failed_load), "Retry", Snackbar.LENGTH_INDEFINITE) {
+            val mIntent = intent
+            finish()
+            startActivity(mIntent)
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun dataFav() : ResultsItem{
@@ -213,17 +231,20 @@ class DetailActivity : AppCompatActivity() {
         const val PAGE_TITLE = "page_title"
         const val DETAIL_INFO = "detail_info"
         const val FAVORITE = "favorite"
+        const val BEFORE = "before"
 
-        fun open(activity: AppCompatActivity, title: String, data: ResultsItem){
+        fun open(activity: AppCompatActivity, title: String, activityBefore: String, data: ResultsItem){
             val intent = Intent(activity, DetailActivity::class.java)
             intent.putExtra(PAGE_TITLE, title)
+            intent.putExtra(BEFORE, activityBefore)
             intent.putExtra(DETAIL_INFO, data)
             ActivityCompat.startActivity(activity, intent, null)
         }
 
-        fun openFavorite(activity: AppCompatActivity, title: String, data: MovieEntity, isFavorite: Boolean){
+        fun openFavorite(activity: AppCompatActivity, title: String, activityBefore: String, data: MovieEntity, isFavorite: Boolean){
             val intent = Intent(activity, DetailActivity::class.java)
             intent.putExtra(PAGE_TITLE, title)
+            intent.putExtra(BEFORE, activityBefore)
             intent.putExtra(DETAIL_INFO, data)
             intent.putExtra(FAVORITE, isFavorite)
             ActivityCompat.startActivity(activity, intent, null)

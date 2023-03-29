@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         adapter.delegate = object : MainWathcListDelegate {
             override fun onItemClicked(selected: MovieEntity) {
                 val dataResult = ResultsItem(selected.overview, selected.originalTitle, selected.title, selected.releaseDate, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.id)
-                DetailActivity.open(this@MainActivity, "Movie Detail", dataResult)
+                DetailActivity.open(this@MainActivity, "Movie Detail", getString(R.string.home),dataResult)
             }
         }
         viewModel.getFav(this, this)
@@ -66,11 +66,8 @@ class MainActivity : AppCompatActivity() {
             searchBar.setOnKeyListener { _, keyEvent, event ->
                 //need to add check action down too, because if not it will triggered twice (down and up)
                 if (keyEvent == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-                    if (query.isEmpty() || query.toString() == ""){
-                        Toast.makeText(this@MainActivity, "Please input keyword", Toast.LENGTH_SHORT).show()
-                    } else {
-                        ListActivity.openSearch(this@MainActivity, "Result of \"$query\"", "search/movie", query.toString())
-                    }
+                    validateAndGo(query.toString())
+
                 }
                 return@setOnKeyListener true
             }
@@ -81,11 +78,7 @@ class MainActivity : AppCompatActivity() {
                 if (event.action == MotionEvent.ACTION_UP) {
                     if (event.rawX >= searchBar.right - searchBar.compoundDrawables[drawableRight].bounds.width()
                     ) {
-                        if (query.isEmpty() || query.toString() == ""){
-                            Toast.makeText(this@MainActivity, "Please input keyword", Toast.LENGTH_SHORT).show()
-                        } else {
-                            ListActivity.openSearch(this@MainActivity, "Result of \"$query\"", "search/movie", query.toString())
-                        }
+                        validateAndGo(query.toString())
                         return@OnTouchListener true
                     }
                 }
@@ -127,6 +120,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun validateAndGo(query: String) {
+        if (query.isEmpty() || query.toString() == ""){
+            Toast.makeText(this@MainActivity, "Please input keyword", Toast.LENGTH_SHORT).show()
+        } else {
+            ListActivity.openSearch(this@MainActivity, "Result of \"$query\"", "search/movie", query.toString())
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -149,28 +150,6 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-//    private fun showAlertLogout(context: Context, title: String, message: String, PositiveCallback: () -> Unit, NegativeCallback: () -> Unit) {
-//        // Create an alert builder
-//        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-//        builder.setTitle("Logout")
-//        builder.setMessage("Are you sure to logout?")
-//
-//        var dialog: AlertDialog? = null
-//
-//        // add a button
-//        builder.setPositiveButton("Yes") { _, _ ->
-//            sharedPref.edit().clear().apply()
-//            viewModel.clearDatabase(this)
-//            LoginActivity.open(this)
-//            finish()
-//        }
-//        builder.setNegativeButton("No") { _, _ ->
-//            dialog?.dismiss()
-//        }
-//        dialog = builder.create()
-//        dialog?.show()
-//    }
 
     companion object{
         fun open(activity: AppCompatActivity){

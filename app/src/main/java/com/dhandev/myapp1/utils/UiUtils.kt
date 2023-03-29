@@ -21,9 +21,9 @@ class UiUtils {
         return loading
     }
 
-    fun showSnackBar(context: Context, parentView: View, message: String, myCallback: () -> Unit) {
-        return Snackbar.make(parentView, message, Snackbar.LENGTH_LONG)
-            .setAction("Undo") {
+    fun showSnackBar(context: Context, parentView: View, message: String, actionText: String, duration: Int, myCallback: () -> Unit) {
+        return Snackbar.make(parentView, message, duration)
+            .setAction(actionText) {
                 myCallback.invoke()
             }
             .setBackgroundTint(Color.WHITE)
@@ -37,7 +37,7 @@ class UiUtils {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         builder.setTitle(title)
         builder.setMessage(message)
-
+        builder.setCancelable(false)
         var dialog: AlertDialog? = null
 
         // add a button
