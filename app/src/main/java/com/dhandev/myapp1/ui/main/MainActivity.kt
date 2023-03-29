@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var sharedPref: SharedPreferences
     private val viewModel: WatchlistViewModel by viewModels()
-
+    private var query = ""
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sharedPref = getSharedPreferences(LoginActivity.USER_DATA, MODE_PRIVATE)
-
+        title = getString(R.string.greetings, sharedPref.getString(LoginActivity.NAME, ""))
         adapter = MainWatchListAdapter()
         binding.rvWatchList.adapter = adapter
 
@@ -62,11 +62,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.apply {
-            val query = searchBar.text.trim()
             searchBar.setOnKeyListener { _, keyEvent, event ->
+                query = searchBar.text.trim().toString()
                 //need to add check action down too, because if not it will triggered twice (down and up)
                 if (keyEvent == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-                    validateAndGo(query.toString())
+                    validateAndGo(query)
 
                 }
                 return@setOnKeyListener true
@@ -78,7 +78,8 @@ class MainActivity : AppCompatActivity() {
                 if (event.action == MotionEvent.ACTION_UP) {
                     if (event.rawX >= searchBar.right - searchBar.compoundDrawables[drawableRight].bounds.width()
                     ) {
-                        validateAndGo(query.toString())
+                        query = searchBar.text.trim().toString()
+                        validateAndGo(query)
                         return@OnTouchListener true
                     }
                 }
@@ -121,8 +122,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validateAndGo(query: String) {
-        if (query.isEmpty() || query.toString() == ""){
-            Toast.makeText(this@MainActivity, "Please input keyword", Toast.LENGTH_SHORT).show()
+        if (query.isEmpty() || query == ""){
+            Toast.makeText(this@MainActivity, query, Toast.LENGTH_SHORT).show()
         } else {
             ListActivity.openSearch(this@MainActivity, "Result of \"$query\"", "search/movie", query.toString())
         }

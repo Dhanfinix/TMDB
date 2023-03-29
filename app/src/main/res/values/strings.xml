@@ -58,5 +58,6 @@
     <string name="undo">Undo</string>
     <string name="image_failed_load">Image failed to load</string>
     <string name="home">Home</string>
+    <string name="greetings">Hello, %1$s!</string>
 </resources>
 
