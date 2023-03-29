@@ -1,5 +1,6 @@
 package com.dhandev.myapp1.ui.detail.people
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -19,6 +20,7 @@ import com.dhandev.myapp1.databinding.ActivityPeopleDetailBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
 import com.dhandev.myapp1.utils.UiUtils
 import com.dhandev.myapp1.utils.dateUtil
+import com.dhandev.myapp1.utils.typeEnum
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.faltenreich.skeletonlayout.createSkeleton
@@ -31,6 +33,7 @@ class PeopleDetailActivity : AppCompatActivity() {
     private lateinit var adapter: PeopleMovieListAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val viewModel : PeopleDetailViewModel by viewModels()
+    private lateinit var loading : Dialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,21 +66,28 @@ class PeopleDetailActivity : AppCompatActivity() {
 
         adapter.delegate = object : PeopleMovieDelegate {
             override fun onItemClicked(selected: KnownForItem) {
+                val type = if (selected.originalTitle == null) typeEnum.TV.body else typeEnum.MOVIE.body
                 val title = selected.originalTitle ?: selected.originalName.toString()
                 val release = selected.releaseDate ?: selected.firstAirDate.toString()
                 val dataResult = ResultsItem(selected.overview, title, selected.title, release, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.id)
-                DetailActivity.open(this@PeopleDetailActivity, "Movie Detail", data?.name!!, dataResult)
+                DetailActivity.open(this@PeopleDetailActivity, "Movie Detail", data?.name!!, type, dataResult.id!!)
             }
         }
         adapter.setAdapter(data?.knownFor!!)
 
-        binding.rvKnownFor.isVisible = data.knownFor.isNotEmpty()
 
         skeleton = binding.mainInfo.createSkeleton()
         skeletonBio = binding.tvBio.createSkeleton()
         skeletonRv = binding.rvKnownFor.applySkeleton(R.layout.list_row_people_item, 5)
 
         getData()
+
+        binding.swipeToRefresh.setOnRefreshListener {
+            //disable inherited loading of swipe layout
+            binding.swipeToRefresh.isRefreshing = false
+            //get data from API
+            getData()
+        }
 
     }
 
@@ -86,17 +96,25 @@ class PeopleDetailActivity : AppCompatActivity() {
 
         skeleton.showSkeleton()
         skeletonBio.showSkeleton()
-        val loading = UiUtils().showLoading(this)
+        loading = UiUtils().showLoading(this)
 
         viewModel.getData(data?.id!!){
+            loading.dismiss()
             showAlert(it)
         }
         viewModel.peopleDetailData.observe(this){peopleData->
+            adapter.setAdapter(data.knownFor!!)
+            binding.rvKnownFor.isVisible = data.knownFor.isNotEmpty()
+
             Glide.with(this)
                 .load("https://image.tmdb.org/t/p/original/${peopleData.profilePath}")
                 .into(binding.ivProfile)
             binding.tvName.text = peopleData.name
-            val gender = if(peopleData.gender == 2) "Male" else "Female"
+            val gender = when(peopleData.gender){
+                1 -> "Female"
+                2 -> "Male"
+                else -> "Not Specified"
+            }
             binding.tvAct.text = "$gender, ${peopleData.knownForDepartment}"
 
             val birthDate = peopleData.birthday?.split("-")

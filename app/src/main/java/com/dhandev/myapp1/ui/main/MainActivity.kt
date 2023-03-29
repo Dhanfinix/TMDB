@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         adapter.delegate = object : MainWathcListDelegate {
             override fun onItemClicked(selected: MovieEntity) {
                 val dataResult = ResultsItem(selected.overview, selected.originalTitle, selected.title, selected.releaseDate, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.id)
-                DetailActivity.open(this@MainActivity, "Movie Detail", getString(R.string.home),dataResult)
+                DetailActivity.open(this@MainActivity, "Movie Detail", getString(R.string.home), selected.type!!,dataResult.id!!)
             }
         }
         viewModel.getFav(this, this)
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             //drawable end listener
-            searchBar.setOnTouchListener(OnTouchListener { v, event ->
+            searchBar.setOnTouchListener(OnTouchListener { _, event ->
                 val drawableRight = 2
                 if (event.action == MotionEvent.ACTION_UP) {
                     if (event.rawX >= searchBar.right - searchBar.compoundDrawables[drawableRight].bounds.width()
@@ -125,7 +125,9 @@ class MainActivity : AppCompatActivity() {
         if (query.isEmpty() || query == ""){
             Toast.makeText(this@MainActivity, query, Toast.LENGTH_SHORT).show()
         } else {
-            ListActivity.openSearch(this@MainActivity, "Result of \"$query\"", "search/movie", query.toString())
+            ListActivity.openSearch(this@MainActivity, "Result of \"$query\"", "search/movie",
+                query
+            )
         }
     }
 

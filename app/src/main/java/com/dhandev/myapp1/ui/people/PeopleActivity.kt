@@ -83,6 +83,7 @@ class PeopleActivity : AppCompatActivity() {
         //get data by calling it from view model, pass path(endpoint), query(for search),
         // and add callback for on response and error
         viewModel.getData { errorMsg ->
+            loading.dismiss()
             showAlert(errorMsg)
         }
         viewModel.peopleData.observe(this){peopleData->

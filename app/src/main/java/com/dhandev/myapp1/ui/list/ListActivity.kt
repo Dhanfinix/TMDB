@@ -18,6 +18,7 @@ import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityListBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
 import com.dhandev.myapp1.utils.UiUtils
+import com.dhandev.myapp1.utils.typeEnum
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 
@@ -54,6 +55,7 @@ class ListActivity : AppCompatActivity() {
 
         //get path for endpoint
         path = intent.getStringExtra(FETCH_PATH) ?: "movie/top_rated"
+        val type = if (path.contains("movie")) typeEnum.MOVIE.body else typeEnum.TV.body
         query = intent.getStringExtra(QUERY) ?: ""
 
         adapter = MovieListAdapter()
@@ -64,7 +66,7 @@ class ListActivity : AppCompatActivity() {
 
         adapter.delegate = object : MovieDelegate {
             override fun onItemClicked(selected: ResultsItem) {
-                DetailActivity.open(this@ListActivity, "Detail", intent.getStringExtra(LIST_TITLE) ?: "List", selected)
+                DetailActivity.open(this@ListActivity, "Detail", intent.getStringExtra(LIST_TITLE) ?: "List", type, selected.id!!)
             }
 
         }
@@ -91,7 +93,8 @@ class ListActivity : AppCompatActivity() {
         //get data by calling it from view model, pass path(endpoint), query(for search),
         // and add callback and error
         viewModel.getData(path, query){errorMsg->
-                showAlert(errorMsg)
+            loading.dismiss()
+            showAlert(errorMsg)
         }
         //observe fetched data from previous function
         viewModel.movieTvData.observe(this){movieData->

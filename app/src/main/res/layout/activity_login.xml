@@ -32,6 +32,7 @@
             android:id="@+id/etName"
             style="@style/et_login"
             android:paddingHorizontal="8dp"
+            android:inputType="text"
             android:hint="@string/hint_name"/>
 
         <EditText
@@ -39,6 +40,7 @@
             style="@style/et_login"
             android:paddingHorizontal="8dp"
             android:layout_marginTop="10dp"
+            android:inputType="text"
             android:hint="@string/hint_pass"/>
 
         <Button

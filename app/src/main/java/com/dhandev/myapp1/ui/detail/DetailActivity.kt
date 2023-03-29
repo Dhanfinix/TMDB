@@ -1,14 +1,13 @@
 package com.dhandev.myapp1.ui.detail
 
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -24,9 +23,9 @@ import com.bumptech.glide.request.target.Target
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.CommentEntity
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
-import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityDetailBinding
 import com.dhandev.myapp1.ui.comment.CommentActivity
+import com.dhandev.myapp1.ui.watchlist.WatchlistActivity
 import com.dhandev.myapp1.utils.UiUtils
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.createSkeleton
@@ -41,8 +40,10 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val viewModel : DetailViewModel by viewModels()
     private val uiUtil = UiUtils()
+    private var id = 0
+    private var path : String? = null
+    private lateinit var loading : Dialog
 
-    private var data : ResultsItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
@@ -76,134 +77,141 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
-        val isFav = intent.getBooleanExtra(FAVORITE, false)
-        data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (isFav){
-                dataFav()
-            } else {
-                intent.getParcelableExtra(DETAIL_INFO, ResultsItem::class.java)
-            }
-        } else {
-            if (isFav){
-                val dataFav = intent.getParcelableExtra<MovieEntity>(DETAIL_INFO)
-                ResultsItem(dataFav?.overview, dataFav?.originalTitle, dataFav?.title, dataFav?.releaseDate, dataFav?.posterPath, dataFav?.backdropPath, dataFav?.voteAverage, dataFav?.id)
-            } else {
-                intent.getParcelableExtra(DETAIL_INFO)
-            }
+        id = intent.getIntExtra(DETAIL_INFO, 0)
+        path = intent.getStringExtra(TYPE)
+        getData(id, path)
+
+        binding.swipeToRefresh.setOnRefreshListener {
+            //disable inherited loading of swipe layout
+            binding.swipeToRefresh.isRefreshing = false
+            //get data from API
+            getData(id, path)
         }
 
-        binding.apply {
-            skeleton = ivBackdrop.createSkeleton()
-            skeletonPoster = ivPoster.createSkeleton()
-            skeleton.showSkeleton()
-            skeletonPoster.showSkeleton()
+    }
 
-            Glide.with(this@DetailActivity)
-                .load("https://image.tmdb.org/t/p/original${data?.backdropPath}")
-                .listener(object : RequestListener<Drawable?> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable?>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        retrySnackBar()
-                        return false
-                    }
+    private fun getData(id: Int, path: String?) {
+        loading = UiUtils().showLoading(this)
+        skeleton = binding.ivBackdrop.createSkeleton()
+        skeletonPoster = binding.ivPoster.createSkeleton()
+        skeleton.showSkeleton()
+        skeletonPoster.showSkeleton()
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable?>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        skeleton.showOriginal()
-                        return false
-                    }
+        viewModel.getData("$path/$id"){
+            loading.dismiss()
+            showAlert(it)
+        }
 
-                })
-                .into(ivBackdrop)
-            Glide.with(this@DetailActivity)
-                .load("https://image.tmdb.org/t/p/original${data?.posterPath}")
-                .transform(RoundedCorners(16))
-                .listener(object : RequestListener<Drawable?> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable?>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        retrySnackBar()
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable?>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        skeletonPoster.showOriginal()
-                        return false
-                    }
-
-                })
-                .into(ivPoster)
-
-            tvOverviewTitle.text = data?.originalTitle
-            tvReleaseDate.text = data?.releaseDate
-            tvRating.text = getString(R.string.rating, data?.voteAverage.toString())
-            tvOverview.text = data?.overview
-
-            viewModel.getById(this@DetailActivity, this@DetailActivity, data?.id!!)
-
-            val detailData = MovieEntity(data?.overview, data?.originalTitle, data?.title, data?.releaseDate, data?.posterPath, data?.backdropPath, data?.voteAverage, data?.id)
-            viewModel.movieTvId.observe(this@DetailActivity){ resultItem->
-                if(resultItem == null){
-                    btnFav.text = getString(R.string.add_to_watch_list)
-                    btnFav.setOnClickListener {
-                        data?.let { viewModel.insertFav(this@DetailActivity, detailData) }
-                        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.added_to_watchlist), getString(
-                            R.string.undo), Snackbar.LENGTH_LONG){
-                            viewModel.delete(this@DetailActivity, detailData)
+        viewModel.movieTvData.observe(this){
+            binding.apply {
+                Glide.with(this@DetailActivity)
+                    .load("https://image.tmdb.org/t/p/original${it?.backdropPath}")
+                    .listener(object : RequestListener<Drawable?> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable?>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            retrySnackBar()
+                            return false
                         }
-                        btnFav.text = getString(R.string.remove_watchlist)
-                    }
-                } else {
-                    btnFav.text = getString(R.string.remove_watchlist)
-                    btnFav.setOnClickListener {
-                        data?.let { viewModel.delete(this@DetailActivity, detailData) }
-                        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.removed_from_watch_list), getString(
-                            R.string.undo), Snackbar.LENGTH_LONG){
-                            viewModel.insertFav(this@DetailActivity, detailData)
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable?>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            skeleton.showOriginal()
+                            return false
                         }
+
+                    })
+                    .into(ivBackdrop)
+                Glide.with(this@DetailActivity)
+                    .load("https://image.tmdb.org/t/p/original${it?.posterPath}")
+                    .transform(RoundedCorners(16))
+                    .listener(object : RequestListener<Drawable?> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable?>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            retrySnackBar()
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable?>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            skeletonPoster.showOriginal()
+                            return false
+                        }
+
+                    })
+                    .into(ivPoster)
+
+                tvOverviewTitle.text = it?.originalTitle
+                tvReleaseDate.text = it?.releaseDate
+                tvRating.text = getString(R.string.rating, it?.voteAverage.toString())
+                tvOverview.text = it?.overview
+
+                viewModel.getById(this@DetailActivity, this@DetailActivity, id)
+
+                val detailData = MovieEntity(it?.overview, it?.originalTitle, it?.title, it?.releaseDate, it?.posterPath, it?.backdropPath, it?.voteAverage, it?.id, intent.getStringExtra(TYPE))
+                viewModel.movieTvId.observe(this@DetailActivity){ resultItem->
+                    if(resultItem == null){
                         btnFav.text = getString(R.string.add_to_watch_list)
+                        btnFav.setOnClickListener {
+                            it?.let { viewModel.insertFav(this@DetailActivity, detailData) }
+                            uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.added_to_watchlist), getString(
+                                R.string.show_all), Snackbar.LENGTH_LONG){
+                                WatchlistActivity.open(this@DetailActivity)
+                            }
+                            btnFav.text = getString(R.string.remove_watchlist)
+                        }
+                    } else {
+                        btnFav.text = getString(R.string.remove_watchlist)
+                        btnFav.setOnClickListener {
+                            it?.let { viewModel.delete(this@DetailActivity, detailData) }
+                            uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.removed_from_watch_list), getString(
+                                R.string.undo), Snackbar.LENGTH_LONG){
+                                viewModel.insertFav(this@DetailActivity, detailData)
+                            }
+                            btnFav.text = getString(R.string.add_to_watch_list)
+                        }
                     }
                 }
-            }
 
-            btnAddReview.setOnClickListener {
-                CommentActivity.openNew(this@DetailActivity, data?.id!!)
-            }
-
-            viewModel.getCommentById(this@DetailActivity, this@DetailActivity, data?.id!!)
-            viewModel.commentById.observe(this@DetailActivity
-            ) { result ->
-                if(result == null || result.isEmpty()){
-                    noCommentsFound.text = getString(R.string.no_comments_available)
-                    noCommentsFound.visibility = View.VISIBLE
-                    binding.rvComment.isVisible = false
-                } else {
-                    noCommentsFound.text = getString(R.string.lorem)
-                    noCommentsFound.visibility = View.GONE
-                    adapter.setAdapter(result)
-                    binding.rvComment.isVisible = result.isNotEmpty()
+                btnAddReview.setOnClickListener {
+                    CommentActivity.openNew(this@DetailActivity, id)
                 }
-            }
 
+                viewModel.getCommentById(this@DetailActivity, this@DetailActivity, id)
+                viewModel.commentById.observe(this@DetailActivity
+                ) { result ->
+                    if(result == null || result.isEmpty()){
+                        noCommentsFound.text = getString(R.string.no_comments_available)
+                        noCommentsFound.visibility = View.VISIBLE
+                        binding.rvComment.isVisible = false
+                    } else {
+                        noCommentsFound.text = getString(R.string.lorem)
+                        noCommentsFound.visibility = View.GONE
+                        adapter.setAdapter(result)
+                        binding.rvComment.isVisible = result.isNotEmpty()
+                    }
+                }
+                loading.dismiss()
+            }
         }
+
     }
 
     private fun retrySnackBar() {
@@ -214,11 +222,19 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun dataFav() : ResultsItem{
-        val dataFav = intent.getParcelableExtra(DETAIL_INFO, MovieEntity::class.java)
-        return ResultsItem(dataFav?.overview, dataFav?.originalTitle, dataFav?.title, dataFav?.releaseDate, dataFav?.posterPath, dataFav?.backdropPath, dataFav?.voteAverage, dataFav?.id)
+    private fun showAlert(message: String) {
+        //show alert by creating showAlert instance from UiUtils, pass needed parameters, and add callback
+        //for positive and negative button
+        UiUtils().showAlert(this, "Warning", message, "Retry", "Back",
+            {
+                skeleton.showOriginal()
+                skeletonPoster.showOriginal()
+                getData(id, path)
+            }, {
+                onBackPressedDispatcher.onBackPressed()
+            })
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
         if(item.itemId == android.R.id.home){
@@ -230,23 +246,15 @@ class DetailActivity : AppCompatActivity() {
     companion object{
         const val PAGE_TITLE = "page_title"
         const val DETAIL_INFO = "detail_info"
-        const val FAVORITE = "favorite"
         const val BEFORE = "before"
+        const val TYPE = "type"
 
-        fun open(activity: AppCompatActivity, title: String, activityBefore: String, data: ResultsItem){
+        fun open(activity: AppCompatActivity, title: String, activityBefore: String, type: String, dataId: Int){
             val intent = Intent(activity, DetailActivity::class.java)
             intent.putExtra(PAGE_TITLE, title)
             intent.putExtra(BEFORE, activityBefore)
-            intent.putExtra(DETAIL_INFO, data)
-            ActivityCompat.startActivity(activity, intent, null)
-        }
-
-        fun openFavorite(activity: AppCompatActivity, title: String, activityBefore: String, data: MovieEntity, isFavorite: Boolean){
-            val intent = Intent(activity, DetailActivity::class.java)
-            intent.putExtra(PAGE_TITLE, title)
-            intent.putExtra(BEFORE, activityBefore)
-            intent.putExtra(DETAIL_INFO, data)
-            intent.putExtra(FAVORITE, isFavorite)
+            intent.putExtra(TYPE, type)
+            intent.putExtra(DETAIL_INFO, dataId)
             ActivityCompat.startActivity(activity, intent, null)
         }
     }

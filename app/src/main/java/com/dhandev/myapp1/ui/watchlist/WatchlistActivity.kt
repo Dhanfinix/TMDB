@@ -54,7 +54,7 @@ class WatchlistActivity : AppCompatActivity() {
 
         adapter.delegate = object : WatchlistDelegate {
             override fun onItemClicked(selected: MovieEntity) {
-                DetailActivity.openFavorite(this@WatchlistActivity, "Detail", getString(R.string.favorite), selected, true)
+                DetailActivity.open(this@WatchlistActivity, "Detail", getString(R.string.favorite), selected.type!!, selected.id!!)
             }
 
             override fun onItemDeleted(selected: MovieEntity) {

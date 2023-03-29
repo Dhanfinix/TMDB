@@ -3,6 +3,7 @@ package com.dhandev.myapp1.data.source.remote.network
 import com.dhandev.myapp1.data.source.remote.response.MovieTvResponse
 import com.dhandev.myapp1.data.source.remote.response.PeopleDetailResponse
 import com.dhandev.myapp1.data.source.remote.response.PeopleResponse
+import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -17,6 +18,14 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("query") query: String,
     ): Call<MovieTvResponse>
+
+    @GET("{endpoint}")
+    fun getMoviesOne(
+        @Path("endpoint") sort: String,
+        @Query("api_key") Authorization : String,
+        @Query("language") lang: String,
+        @Query("page") page: Int,
+    ): Call<ResultsItem>
 
     @GET("person/popular")
     fun getPeople(

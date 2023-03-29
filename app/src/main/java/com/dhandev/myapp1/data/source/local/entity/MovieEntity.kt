@@ -35,4 +35,6 @@ data class MovieEntity(
     @ColumnInfo("id")
     val id: Int? = null,
 
+    @ColumnInfo("type")
+    val type: String? = null,
 ) : Parcelable
