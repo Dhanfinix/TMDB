@@ -47,11 +47,6 @@ class CommentActivity : AppCompatActivity() {
                         comment = etBodyComment.text.toString()
                         println("THIS IS COMMENT ENITITY -> $commentEntity")
                         if (validate(name, comment)) {
-                            Toast.makeText(
-                                this@CommentActivity,
-                                "DATA ADA_UPDATE",
-                                Toast.LENGTH_SHORT
-                            ).show()
                             viewModel.updateComment(
                                 this@CommentActivity,
                                 CommentEntity(
@@ -77,8 +72,6 @@ class CommentActivity : AppCompatActivity() {
                     name = etNameComment.text.toString()
                     comment = etBodyComment.text.toString()
                     if (validate(name, comment)) {
-                        Toast.makeText(this@CommentActivity, "DATA KOSONG_BARU", Toast.LENGTH_SHORT)
-                            .show()
                         viewModel.insertComment(
                             this@CommentActivity,
                             CommentEntity(

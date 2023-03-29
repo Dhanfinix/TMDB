@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.apply {
-            val query = searchBar.text
+            val query = searchBar.text.trim()
             searchBar.setOnKeyListener { _, keyEvent, event ->
                 //need to add check action down too, because if not it will triggered twice (down and up)
                 if (keyEvent == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
             R.id.logout -> {
                 UiUtils().showAlert(this, "Logout", "Are you sure to logout?", "Yes", "No",
                 {
-                    sharedPref.edit().clear().apply()
+                    sharedPref.edit().remove(LoginActivity.IS_LOGIN).apply()
                     viewModel.clearDatabase(this)
                     LoginActivity.open(this)
                     finish()

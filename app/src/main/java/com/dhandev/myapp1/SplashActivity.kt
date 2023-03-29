@@ -15,7 +15,7 @@ class SplashActivity : AppCompatActivity() {
 
         sharedPref = getSharedPreferences(LoginActivity.USER_DATA, MODE_PRIVATE)
 
-        if (sharedPref.getString(LoginActivity.NAME, null) != null){
+        if (sharedPref.getBoolean(LoginActivity.IS_LOGIN, false)){
             MainActivity.open(this)
             finish()
         } else {

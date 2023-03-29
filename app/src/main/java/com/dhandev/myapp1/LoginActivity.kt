@@ -21,12 +21,13 @@ class LoginActivity : AppCompatActivity() {
 
 
         binding.btnLogin.setOnClickListener {
-            val name = binding.etName.text.toString()
-            val password = binding.etPass.text.toString()
+            val name = binding.etName.text.trim().toString()
+            val password = binding.etPass.text.trim().toString()
 
             if (validate(name, password)){
                 editor.putString(NAME, name)
                 editor.putString(PASSWORD, password)
+                editor.putBoolean(IS_LOGIN, true)
                 editor.apply()
                 MainActivity.open(this)
                 finish()
@@ -35,12 +36,22 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun validate(name: String, password: String) : Boolean{
+        val lastUser = sharedPref.getString(NAME, null)
+        val lastPass = sharedPref.getString(PASSWORD, null)
+
         val result: Boolean = if (name.isEmpty()){
             Toast.makeText(this, "Please fill name input", Toast.LENGTH_SHORT).show()
             false
         } else if(password.isEmpty()){
             Toast.makeText(this, "Please fill password input", Toast.LENGTH_SHORT).show()
             false
+        } else if (lastUser == name) {
+            if (lastPass != password){
+                Toast.makeText(this, "Password incorrect", Toast.LENGTH_SHORT).show()
+                return false
+            } else {
+                return true
+            }
         } else{
             true
         }
@@ -51,6 +62,7 @@ class LoginActivity : AppCompatActivity() {
         const val USER_DATA = "user_data"
         const val NAME = "name"
         const val PASSWORD = "password"
+        const val IS_LOGIN = "is_login"
 
         fun open(activity: AppCompatActivity){
             val intent = Intent(activity, LoginActivity::class.java)
