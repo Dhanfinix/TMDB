@@ -1,4 +1,4 @@
-package com.dhandev.myapp1
+package com.dhandev.myapp1.ui
 
 import android.content.Intent
 import android.content.SharedPreferences

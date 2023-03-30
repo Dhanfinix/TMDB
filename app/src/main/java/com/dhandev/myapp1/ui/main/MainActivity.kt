@@ -11,7 +11,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.dhandev.myapp1.LoginActivity
+import com.dhandev.myapp1.ui.LoginActivity
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem

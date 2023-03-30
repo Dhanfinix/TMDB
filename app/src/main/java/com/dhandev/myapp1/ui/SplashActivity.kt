@@ -1,4 +1,4 @@
-package com.dhandev.myapp1
+package com.dhandev.myapp1.ui
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
