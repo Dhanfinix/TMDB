@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import com.dhandev.myapp1.BuildConfig
 import com.dhandev.myapp1.data.source.local.entity.CommentEntity
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
+import com.dhandev.myapp1.data.source.local.entity.WatchlistUpdate
 import com.dhandev.myapp1.data.source.local.room.AppDatabase
 import com.dhandev.myapp1.data.source.local.room.CommentDatabase
 import com.dhandev.myapp1.data.source.remote.network.ApiConfig
@@ -17,9 +18,9 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class DetailViewModel: ViewModel() {
-    private val _movieTvId = MutableLiveData<MovieEntity>()
-    val movieTvId : LiveData<MovieEntity>
-        get() = _movieTvId
+    private val _watchlisted = MutableLiveData<Boolean>()
+    val watchlisted : LiveData<Boolean>
+        get() = _watchlisted
 
     private val _commentById = MutableLiveData<List<CommentEntity>>()
     val commentById : LiveData<List<CommentEntity>>
@@ -30,16 +31,17 @@ class DetailViewModel: ViewModel() {
     val movieTvData : LiveData<ResultsItem>
         get() = _movieTvData
 
-    fun insertFav(context: Context, data: MovieEntity){
+    fun updateWatchlist(context: Context, data: WatchlistUpdate){
         viewModelScope.launch(Dispatchers.IO) {
-            AppDatabase.getDatabase(context).movieDao().insertFav(data)
+            AppDatabase.getDatabase(context).movieDao().update(data)
         }
     }
 
-    fun getById(context: Context, owner: LifecycleOwner, id: Int){
-        AppDatabase.getDatabase(context).movieDao().getById(id).observe(owner){result->
-            _movieTvId.postValue(result)
+    fun getWatchlist(context: Context, id: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            _watchlisted.postValue(AppDatabase.getDatabase(context).movieDao().isMovieTvWatchlisted(id))
         }
+
     }
 
     fun delete(context: Context, data: MovieEntity){

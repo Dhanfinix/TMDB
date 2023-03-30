@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
+import com.dhandev.myapp1.data.source.local.entity.WatchlistUpdate
 import com.dhandev.myapp1.databinding.ActivityWatchlistBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
 import com.dhandev.myapp1.utils.UiUtils
@@ -58,10 +59,10 @@ class WatchlistActivity : AppCompatActivity() {
             }
 
             override fun onItemDeleted(selected: MovieEntity) {
-                viewModel.delete(this@WatchlistActivity, selected)
+                viewModel.updateWatchlist(this@WatchlistActivity, WatchlistUpdate(selected.id, false))
                 uiUtil.showSnackBar(this@WatchlistActivity, binding.root, getString(R.string.removed_from_watch_list), getString(
                                     R.string.undo), Snackbar.LENGTH_LONG){
-                    viewModel.insertFav(this@WatchlistActivity, selected)
+                    viewModel.updateWatchlist(this@WatchlistActivity, WatchlistUpdate(selected.id, true))
                 }
             }
         }

@@ -88,10 +88,11 @@ class ListActivity : AppCompatActivity() {
 
     private fun getData() {
         Toast.makeText(this, endpoint, Toast.LENGTH_SHORT).show()
-        val factory : ListViewModelFactory = ListViewModelFactory.getInstance(this, endpoint, query)
+        val factory : ListViewModelFactory = ListViewModelFactory.getInstance(this)
         val viewModel : ListViewModel by viewModels{factory}
+        val sortBy = if (endpoint.contains("top_rated")) "vote_average" else if (endpoint.contains("popular")) "popularity" else "release_date"
 
-        viewModel.getDataRepo().observe(this){result->
+        viewModel.getDataRepo(endpoint, query, sortBy).observe(this){result->
             if (result != null){
                 when(result){
                     is com.dhandev.myapp1.data.Result.Loading -> {

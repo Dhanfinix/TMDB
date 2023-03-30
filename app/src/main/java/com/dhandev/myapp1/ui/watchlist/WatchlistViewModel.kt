@@ -3,6 +3,7 @@ package com.dhandev.myapp1.ui.watchlist
 import android.content.Context
 import androidx.lifecycle.*
 import com.dhandev.myapp1.data.source.local.entity.MovieEntity
+import com.dhandev.myapp1.data.source.local.entity.WatchlistUpdate
 import com.dhandev.myapp1.data.source.local.room.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,9 +13,9 @@ class WatchlistViewModel: ViewModel() {
     val data : LiveData<List<MovieEntity>>
         get() = _data
 
-    fun insertFav(context: Context, data: MovieEntity){
+    fun updateWatchlist(context: Context, data: WatchlistUpdate){
         viewModelScope.launch(Dispatchers.IO) {
-            AppDatabase.getDatabase(context).movieDao().insertFav(data)
+            AppDatabase.getDatabase(context).movieDao().update(data)
         }
     }
 

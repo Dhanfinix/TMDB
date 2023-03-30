@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 
         adapter.delegate = object : MainWathcListDelegate {
             override fun onItemClicked(selected: MovieEntity) {
-                val dataResult = ResultsItem(selected.overview, selected.originalTitle, selected.title, selected.releaseDate, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.id)
+                val dataResult = ResultsItem(selected.overview, selected.originalTitle, selected.title, selected.releaseDate, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.popularity, selected.id)
                 DetailActivity.open(this@MainActivity, "Movie Detail", getString(R.string.home), selected.type!!,dataResult.id!!)
             }
         }

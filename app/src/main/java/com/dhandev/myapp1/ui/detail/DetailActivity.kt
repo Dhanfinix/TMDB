@@ -22,7 +22,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.local.entity.CommentEntity
-import com.dhandev.myapp1.data.source.local.entity.MovieEntity
+import com.dhandev.myapp1.data.source.local.entity.WatchlistUpdate
 import com.dhandev.myapp1.databinding.ActivityDetailBinding
 import com.dhandev.myapp1.ui.comment.CommentActivity
 import com.dhandev.myapp1.ui.watchlist.WatchlistActivity
@@ -102,10 +102,10 @@ class DetailActivity : AppCompatActivity() {
             showAlert(it)
         }
 
-        viewModel.movieTvData.observe(this){
+        viewModel.movieTvData.observe(this){currentData->
             binding.apply {
                 Glide.with(this@DetailActivity)
-                    .load("https://image.tmdb.org/t/p/original${it?.backdropPath}")
+                    .load("https://image.tmdb.org/t/p/original${currentData?.backdropPath}")
                     .listener(object : RequestListener<Drawable?> {
                         override fun onLoadFailed(
                             e: GlideException?,
@@ -131,7 +131,7 @@ class DetailActivity : AppCompatActivity() {
                     })
                     .into(ivBackdrop)
                 Glide.with(this@DetailActivity)
-                    .load("https://image.tmdb.org/t/p/original${it?.posterPath}")
+                    .load("https://image.tmdb.org/t/p/original${currentData?.posterPath}")
                     .transform(RoundedCorners(16))
                     .listener(object : RequestListener<Drawable?> {
                         override fun onLoadFailed(
@@ -158,19 +158,18 @@ class DetailActivity : AppCompatActivity() {
                     })
                     .into(ivPoster)
 
-                tvOverviewTitle.text = it?.originalTitle
-                tvReleaseDate.text = it?.releaseDate
-                tvRating.text = getString(R.string.rating, it?.voteAverage.toString())
-                tvOverview.text = it?.overview
+                tvOverviewTitle.text = currentData?.originalTitle
+                tvReleaseDate.text = currentData?.releaseDate
+                tvRating.text = getString(R.string.rating, currentData?.voteAverage.toString())
+                tvOverview.text = currentData?.overview
 
-                viewModel.getById(this@DetailActivity, this@DetailActivity, id)
+                viewModel.getWatchlist(this@DetailActivity, id)
 
-                val detailData = MovieEntity(it?.overview, it?.originalTitle, it?.title, it?.releaseDate, it?.posterPath, it?.backdropPath, it?.voteAverage, it?.id, intent.getStringExtra(TYPE))
-                viewModel.movieTvId.observe(this@DetailActivity){ resultItem->
-                    if(resultItem == null){
+                viewModel.watchlisted.observe(this@DetailActivity){ isWatchlisted->
+                    if(!isWatchlisted){
                         btnFav.text = getString(R.string.add_to_watch_list)
                         btnFav.setOnClickListener {
-                            it?.let { viewModel.insertFav(this@DetailActivity, detailData) }
+                            it?.let { viewModel.updateWatchlist(this@DetailActivity, WatchlistUpdate(currentData.id, true)) }
                             uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.added_to_watchlist), getString(
                                 R.string.show_all), Snackbar.LENGTH_LONG){
                                 WatchlistActivity.open(this@DetailActivity)
@@ -180,10 +179,10 @@ class DetailActivity : AppCompatActivity() {
                     } else {
                         btnFav.text = getString(R.string.remove_watchlist)
                         btnFav.setOnClickListener {
-                            it?.let { viewModel.delete(this@DetailActivity, detailData) }
+                            it?.let { viewModel.updateWatchlist(this@DetailActivity, WatchlistUpdate(currentData.id, false)) }
                             uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.removed_from_watch_list), getString(
                                 R.string.undo), Snackbar.LENGTH_LONG){
-                                viewModel.insertFav(this@DetailActivity, detailData)
+                                viewModel.updateWatchlist(this@DetailActivity, WatchlistUpdate(currentData.id, true))
                             }
                             btnFav.text = getString(R.string.add_to_watch_list)
                         }

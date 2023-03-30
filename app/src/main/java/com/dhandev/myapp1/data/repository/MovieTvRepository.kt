@@ -17,13 +17,11 @@ import retrofit2.Response
 class MovieTvRepository private constructor(
     private val apiService: ApiService,
     private val movieDao: MovieDao,
-    private val appExecutors: AppExecutors,
-    private val endpoint: String,
-    private val query: String
+    private val appExecutors: AppExecutors
 ){
     private val result = MediatorLiveData<Result<List<MovieEntity>>>()
 
-    fun getMovieTvData(): LiveData<Result<List<MovieEntity>>>{
+    fun getMovieTvData(endpoint: String, query: String, sort: String): LiveData<Result<List<MovieEntity>>>{
         val type = if (endpoint.contains("movie")) TypeEnum.MOVIE.body else TypeEnum.TV.body
 
         result.value = Result.Loading
@@ -49,6 +47,7 @@ class MovieTvRepository private constructor(
                                 resultsItem.posterPath,
                                 resultsItem.backdropPath,
                                 resultsItem.voteAverage,
+                                resultsItem.popularity,
                                 resultsItem.id,
                                 type,
                                 isWatchListed
@@ -66,7 +65,7 @@ class MovieTvRepository private constructor(
             }
 
         })
-        val localData = movieDao.getMovieTv()
+        val localData = movieDao.getMovieTv(sort)
         result.addSource(localData){newData : List<MovieEntity> ->
             result.value = Result.Success(newData)
         }
@@ -80,12 +79,10 @@ class MovieTvRepository private constructor(
         fun getInstance(
             apiService: ApiService,
             movieDao: MovieDao,
-            appExecutors: AppExecutors,
-            endpoint: String,
-            query: String
+            appExecutors: AppExecutors
         ): MovieTvRepository =
             instance ?: synchronized(this) {
-                instance ?: MovieTvRepository(apiService, movieDao, appExecutors, endpoint, query)
+                instance ?: MovieTvRepository(apiService, movieDao, appExecutors)
             }.also { instance = it }
     }
 }

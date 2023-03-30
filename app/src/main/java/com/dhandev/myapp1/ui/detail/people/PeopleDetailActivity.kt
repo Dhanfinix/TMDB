@@ -70,7 +70,7 @@ class PeopleDetailActivity : AppCompatActivity() {
                 val type = if (selected.originalTitle == null) TypeEnum.TV.body else TypeEnum.MOVIE.body
                 val title = selected.originalTitle ?: selected.originalName.toString()
                 val release = selected.releaseDate ?: selected.firstAirDate.toString()
-                val dataResult = ResultsItem(selected.overview, title, selected.title, release, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.id)
+                val dataResult = ResultsItem(selected.overview, title, selected.title, release, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.popularity, selected.id)
                 DetailActivity.open(this@PeopleDetailActivity, "Movie Detail", data?.name!!, type, dataResult.id!!)
             }
         }

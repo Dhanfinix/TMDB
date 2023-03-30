@@ -84,6 +84,9 @@ data class KnownForItem(
 	@field:SerializedName("vote_average")
 	val voteAverage: Double? = null,
 
+	@field:SerializedName("popularity")
+	val popularity: Double? = null,
+
 	@field:SerializedName("id")
 	val id: Int? = null,
 

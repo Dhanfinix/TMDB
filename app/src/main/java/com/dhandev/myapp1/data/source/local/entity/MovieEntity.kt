@@ -31,6 +31,9 @@ data class MovieEntity(
     @ColumnInfo("vote_average")
     val voteAverage: Double? = null,
 
+    @ColumnInfo("popularity")
+    val popularity: Double? = null,
+
     @PrimaryKey
     @ColumnInfo("id")
     val id: Int? = null,
@@ -40,4 +43,13 @@ data class MovieEntity(
 
     @ColumnInfo("watchlist")
     val watchlist: Boolean = false,
+
 ) : Parcelable
+
+@Entity
+data class WatchlistUpdate(
+    @ColumnInfo("id")
+    val id: Int? = null,
+    @ColumnInfo("watchlist")
+    val watchlist: Boolean = false,
+)

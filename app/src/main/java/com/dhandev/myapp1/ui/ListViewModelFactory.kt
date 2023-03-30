@@ -20,10 +20,9 @@ class ListViewModelFactory private constructor(private val newsRepository: Movie
     companion object {
         @Volatile
         private var instance: ListViewModelFactory? = null
-        fun getInstance(context: Context, endpoint: String, query: String): ListViewModelFactory =
+        fun getInstance(context: Context): ListViewModelFactory =
             instance ?: synchronized(this) {
-                println("ON Factory -> $endpoint & $query")
-                instance ?: ListViewModelFactory(Injection.provideRepository(context, endpoint, query))
+                instance ?: ListViewModelFactory(Injection.provideRepository(context))
             }.also { instance = it }
     }
 }

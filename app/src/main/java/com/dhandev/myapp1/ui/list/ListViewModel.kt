@@ -42,6 +42,6 @@ class ListViewModel(private val repository: MovieTvRepository): ViewModel() {
             })
     }
 
-    fun getDataRepo() = repository.getMovieTvData()
+    fun getDataRepo(endpoint: String, query: String, sort: String) = repository.getMovieTvData(endpoint, query, sort)
 
 }

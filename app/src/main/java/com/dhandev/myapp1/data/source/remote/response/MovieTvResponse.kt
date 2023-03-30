@@ -48,6 +48,9 @@ data class ResultsItem(
 	@field:SerializedName("vote_average")
 	val voteAverage: Double? = null,
 
+	@field:SerializedName("popularity")
+	val popularity: Double? = null,
+
 	@PrimaryKey
 	@field:SerializedName("id")
 	val id: Int? = null,
