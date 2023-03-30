@@ -2,7 +2,7 @@ package com.dhandev.myapp1.utils
 
 import java.util.*
 
-class dateUtil {
+class DateUtil {
     fun getDate(year: String, month: String, day: String): String{
         val birth = Calendar.getInstance()
         val today = Calendar.getInstance()

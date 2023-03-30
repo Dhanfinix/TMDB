@@ -4,7 +4,6 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/semi_transparent"
     android:orientation="vertical">
 
     <LinearLayout
@@ -40,16 +39,16 @@
             android:id="@+id/btn_delete"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:padding="10dp"
+            android:padding="16dp"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:src="@drawable/ic_baseline_delete_24"
+            android:src="@drawable/trash_fill_svgrepo_com"
             android:contentDescription="@string/poster_image" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/white"/>
+        android:background="@color/semi_transparent"/>
 
 </LinearLayout>

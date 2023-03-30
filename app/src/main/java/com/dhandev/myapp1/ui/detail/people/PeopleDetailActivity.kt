@@ -12,15 +12,16 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.remote.response.KnownForItem
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.data.source.remote.response.ResultsPeopleItem
 import com.dhandev.myapp1.databinding.ActivityPeopleDetailBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
+import com.dhandev.myapp1.utils.DateUtil
+import com.dhandev.myapp1.utils.TypeEnum
 import com.dhandev.myapp1.utils.UiUtils
-import com.dhandev.myapp1.utils.dateUtil
-import com.dhandev.myapp1.utils.typeEnum
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 import com.faltenreich.skeletonlayout.createSkeleton
@@ -66,7 +67,7 @@ class PeopleDetailActivity : AppCompatActivity() {
 
         adapter.delegate = object : PeopleMovieDelegate {
             override fun onItemClicked(selected: KnownForItem) {
-                val type = if (selected.originalTitle == null) typeEnum.TV.body else typeEnum.MOVIE.body
+                val type = if (selected.originalTitle == null) TypeEnum.TV.body else TypeEnum.MOVIE.body
                 val title = selected.originalTitle ?: selected.originalName.toString()
                 val release = selected.releaseDate ?: selected.firstAirDate.toString()
                 val dataResult = ResultsItem(selected.overview, title, selected.title, release, selected.posterPath, selected.backdropPath, selected.voteAverage, selected.id)
@@ -108,6 +109,7 @@ class PeopleDetailActivity : AppCompatActivity() {
 
             Glide.with(this)
                 .load("https://image.tmdb.org/t/p/original/${peopleData.profilePath}")
+                .transform(RoundedCorners(16))
                 .into(binding.ivProfile)
             binding.tvName.text = peopleData.name
             val gender = when(peopleData.gender){
@@ -126,9 +128,9 @@ class PeopleDetailActivity : AppCompatActivity() {
             val monthDeath = deathDate?.get(1)
             val dayDeath = deathDate?.get(2)
             if (birthDate != null && peopleData.deathday == null) {
-                binding.tvBirthday.text = "${peopleData.birthday} (${dateUtil().getDate(year!!, month!!, day!!)} years old)"
+                binding.tvBirthday.text = "${peopleData.birthday} (${DateUtil().getDate(year!!, month!!, day!!)} years old)"
             } else if (peopleData.deathday != null){
-                binding.tvBirthday.text = "${peopleData.birthday} (Death at ${dateUtil().getDeathDate(year!!, month!!, day!!, yearDeath!!, monthDeath!!, dayDeath!!)} years old)"
+                binding.tvBirthday.text = "${peopleData.birthday} (Death at ${DateUtil().getDeathDate(year!!, month!!, day!!, yearDeath!!, monthDeath!!, dayDeath!!)} years old)"
             }
             binding.tvLoc.text = peopleData.placeOfBirth
             binding.tvKnownAs.text = peopleData.alsoKnownAs?.joinToString(",")

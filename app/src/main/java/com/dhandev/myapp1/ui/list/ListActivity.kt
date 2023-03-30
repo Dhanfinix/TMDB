@@ -17,8 +17,8 @@ import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityListBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
+import com.dhandev.myapp1.utils.TypeEnum
 import com.dhandev.myapp1.utils.UiUtils
-import com.dhandev.myapp1.utils.typeEnum
 import com.faltenreich.skeletonlayout.Skeleton
 import com.faltenreich.skeletonlayout.applySkeleton
 
@@ -55,7 +55,7 @@ class ListActivity : AppCompatActivity() {
 
         //get path for endpoint
         path = intent.getStringExtra(FETCH_PATH) ?: "movie/top_rated"
-        val type = if (path.contains("movie")) typeEnum.MOVIE.body else typeEnum.TV.body
+        val type = if (path.contains("movie")) TypeEnum.MOVIE.body else TypeEnum.TV.body
         query = intent.getStringExtra(QUERY) ?: ""
 
         adapter = MovieListAdapter()
