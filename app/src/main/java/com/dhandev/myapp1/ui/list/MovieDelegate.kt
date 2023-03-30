@@ -1,7 +1,7 @@
 package com.dhandev.myapp1.ui.list
 
-import com.dhandev.myapp1.data.source.remote.response.ResultsItem
+import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 
 interface MovieDelegate {
-    fun onItemClicked(selected: ResultsItem)
+    fun onItemClicked(selected: MovieEntity)
 }

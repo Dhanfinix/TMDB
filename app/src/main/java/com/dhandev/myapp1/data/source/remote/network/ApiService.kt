@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface ApiService {
     @GET("{endpoint}")
     fun getMovies(
-        @Path("endpoint") sort: String,
+        @Path("endpoint") endpoint: String,
         @Query("api_key") Authorization : String,
         @Query("language") lang: String,
         @Query("page") page: Int,

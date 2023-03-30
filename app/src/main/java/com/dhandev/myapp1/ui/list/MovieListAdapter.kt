@@ -7,11 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.dhandev.myapp1.R
+import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 
 class MovieListAdapter: RecyclerView.Adapter<MovieViewHolder>() {
 
-    private val list: MutableList<ResultsItem> = mutableListOf()
+    private val list: MutableList<MovieEntity> = mutableListOf()
     var delegate: MovieDelegate? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
@@ -37,7 +38,7 @@ class MovieListAdapter: RecyclerView.Adapter<MovieViewHolder>() {
     override fun getItemCount() = list.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setAdapter(movies: List<ResultsItem>) {
+    fun setAdapter(movies: List<MovieEntity>) {
         list.clear()
         list.addAll(movies)
         notifyDataSetChanged()

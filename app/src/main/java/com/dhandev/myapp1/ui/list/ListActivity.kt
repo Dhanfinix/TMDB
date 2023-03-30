@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -14,8 +15,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.dhandev.myapp1.R
-import com.dhandev.myapp1.data.source.remote.response.ResultsItem
+import com.dhandev.myapp1.data.source.local.entity.MovieEntity
 import com.dhandev.myapp1.databinding.ActivityListBinding
+import com.dhandev.myapp1.ui.ListViewModelFactory
 import com.dhandev.myapp1.ui.detail.DetailActivity
 import com.dhandev.myapp1.utils.TypeEnum
 import com.dhandev.myapp1.utils.UiUtils
@@ -27,8 +29,7 @@ class ListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListBinding
     private lateinit var skeleton: Skeleton
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private val viewModel : ListViewModel by viewModels()
-    private var path = ""
+    private var endpoint = ""
     private var query = ""
     private lateinit var loading : Dialog
 
@@ -54,8 +55,8 @@ class ListActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         //get path for endpoint
-        path = intent.getStringExtra(FETCH_PATH) ?: "movie/top_rated"
-        val type = if (path.contains("movie")) TypeEnum.MOVIE.body else TypeEnum.TV.body
+        endpoint = intent.getStringExtra(FETCH_PATH) ?: "movie/top_rated"
+        val type = if (endpoint.contains("movie")) TypeEnum.MOVIE.body else TypeEnum.TV.body
         query = intent.getStringExtra(QUERY) ?: ""
 
         adapter = MovieListAdapter()
@@ -65,7 +66,7 @@ class ListActivity : AppCompatActivity() {
         binding.rvList.layoutManager = linearLayoutManager
 
         adapter.delegate = object : MovieDelegate {
-            override fun onItemClicked(selected: ResultsItem) {
+            override fun onItemClicked(selected: MovieEntity) {
                 DetailActivity.open(this@ListActivity, "Detail", intent.getStringExtra(LIST_TITLE) ?: "List", type, selected.id!!)
             }
 
@@ -86,26 +87,54 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun getData() {
-        //show shimmering/skeleton and loading popup
-        skeleton.showSkeleton()
-        loading = UiUtils().showLoading(this)
+        Toast.makeText(this, endpoint, Toast.LENGTH_SHORT).show()
+        val factory : ListViewModelFactory = ListViewModelFactory.getInstance(this, endpoint, query)
+        val viewModel : ListViewModel by viewModels{factory}
 
-        //get data by calling it from view model, pass path(endpoint), query(for search),
-        // and add callback and error
-        viewModel.getData(path, query){errorMsg->
-            loading.dismiss()
-            showAlert(errorMsg)
-        }
-        //observe fetched data from previous function
-        viewModel.movieTvData.observe(this){movieData->
-            adapter.setAdapter(movieData)
-            binding.rvList.isVisible = movieData.isNotEmpty()
-            skeleton.showOriginal()
-            loading.dismiss()
-            if (movieData.isEmpty()){
-                binding.notFound.visibility = View.VISIBLE
+        viewModel.getDataRepo().observe(this){result->
+            if (result != null){
+                when(result){
+                    is com.dhandev.myapp1.data.Result.Loading -> {
+                        skeleton.showSkeleton()
+                        loading = UiUtils().showLoading(this)
+                    }
+                    is com.dhandev.myapp1.data.Result.Success -> {
+                        adapter.setAdapter(result.data)
+                        binding.rvList.isVisible = result.data.isNotEmpty()
+                        skeleton.showOriginal()
+                        loading.dismiss()
+                        if (result.data.isEmpty()){
+                            binding.notFound.visibility = View.VISIBLE
+                        }
+                    }
+                    is com.dhandev.myapp1.data.Result.Error -> {
+                        loading.dismiss()
+                        showAlert(result.error)
+                    }
+                }
             }
         }
+
+//        //show shimmering/skeleton and loading popup
+//        skeleton.showSkeleton()
+//        loading = UiUtils().showLoading(this)
+//
+//        //get data by calling it from view model, pass path(endpoint), query(for search),
+//        // and add callback and error
+//        viewModel.getData(endpoint, query){ errorMsg->
+//            loading.dismiss()
+//            showAlert(errorMsg)
+//        }
+//        //observe fetched data from previous function
+//        viewModel.movieTvData.observe(this){movieData->
+//            adapter.setAdapter(movieData)
+//            binding.rvList.isVisible = movieData.isNotEmpty()
+//            skeleton.showOriginal()
+//            loading.dismiss()
+//            if (movieData.isEmpty()){
+//                binding.notFound.visibility = View.VISIBLE
+//            }
+//        }
     }
 
     private fun showAlert(message: String) {

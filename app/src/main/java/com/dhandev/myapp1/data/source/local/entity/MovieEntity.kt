@@ -37,4 +37,7 @@ data class MovieEntity(
 
     @ColumnInfo("type")
     val type: String? = null,
+
+    @ColumnInfo("watchlist")
+    val watchlist: Boolean = false,
 ) : Parcelable
