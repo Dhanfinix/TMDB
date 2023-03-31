@@ -6,17 +6,25 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.dhandev.myapp1.R
 import com.dhandev.myapp1.data.source.remote.response.ResultsItem
 import com.dhandev.myapp1.databinding.ActivityListBinding
 import com.dhandev.myapp1.ui.detail.DetailActivity
+import com.dhandev.myapp1.ui.factory.movie.NowPlayingMovieModelFactory
+import com.dhandev.myapp1.ui.factory.movie.PopularMovieModelFactory
+import com.dhandev.myapp1.ui.factory.movie.TopRatedMovieModelFactory
+import com.dhandev.myapp1.ui.factory.movie.UpcomingMovieModelFactory
+import com.dhandev.myapp1.ui.factory.tv.AirTodayTvModelFactory
+import com.dhandev.myapp1.ui.factory.tv.OnAirTvModelFactory
+import com.dhandev.myapp1.ui.factory.tv.PopularTvModelFactory
+import com.dhandev.myapp1.ui.factory.tv.TopRatedTvModelFactory
 import com.dhandev.myapp1.utils.TypeEnum
 import com.dhandev.myapp1.utils.UiUtils
 import com.faltenreich.skeletonlayout.Skeleton
@@ -27,10 +35,11 @@ class ListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListBinding
     private lateinit var skeleton: Skeleton
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private val viewModel : ListViewModel by viewModels()
     private var path = ""
     private var query = ""
+    private var type = ""
     private lateinit var loading : Dialog
+    private lateinit var viewModel : ListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +64,7 @@ class ListActivity : AppCompatActivity() {
 
         //get path for endpoint
         path = intent.getStringExtra(FETCH_PATH) ?: "movie/top_rated"
-        val type = if (path.contains("movie")) TypeEnum.MOVIE.body else TypeEnum.TV.body
+        type = if (path.contains("movie")) TypeEnum.MOVIE.body else TypeEnum.TV.body
         query = intent.getStringExtra(QUERY) ?: ""
 
         adapter = MovieListAdapter()
@@ -86,15 +95,30 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun getData() {
+        //TODO: CHANGE FACTORY BASED ON PATH/ TYPE
+
+        val factory = when (path) {
+            "movie/top_rated" -> TopRatedMovieModelFactory.getInstance(this)
+            "movie/popular" -> PopularMovieModelFactory.getInstance(this)
+            "movie/upcoming" -> UpcomingMovieModelFactory.getInstance(this)
+            "movie/now_playing" -> NowPlayingMovieModelFactory.getInstance(this)
+            "tv/top_rated" -> TopRatedTvModelFactory.getInstance(this)
+            "tv/popular" -> PopularTvModelFactory.getInstance(this)
+            "tv/airing_today" -> AirTodayTvModelFactory.getInstance(this)
+            "tv/on_the_air" -> OnAirTvModelFactory.getInstance(this)
+            else -> throw IllegalArgumentException("Invalid endpoint")
+        }
+        viewModel = ViewModelProvider(this, factory)[ListViewModel::class.java]
+
         //show shimmering/skeleton and loading popup
         skeleton.showSkeleton()
         loading = UiUtils().showLoading(this)
 
         //get data by calling it from view model, pass path(endpoint), query(for search),
         // and add callback and error
-        viewModel.getData(path, query){errorMsg->
+        viewModel.errorMsg.observe(this){
             loading.dismiss()
-            showAlert(errorMsg)
+            showAlert(it)
         }
         //observe fetched data from previous function
         viewModel.movieTvData.observe(this){movieData->
@@ -106,6 +130,8 @@ class ListActivity : AppCompatActivity() {
                 binding.notFound.visibility = View.VISIBLE
             }
         }
+
+
     }
 
     private fun showAlert(message: String) {

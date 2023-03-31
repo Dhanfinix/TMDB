@@ -1,5 +1,6 @@
 package com.dhandev.myapp1.ui.list
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,13 +13,21 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ListViewModel: ViewModel() {
+class ListViewModel(context: Context, endpoint: String, query: String): ViewModel() {
 
     private val _movieTvData = MutableLiveData<List<ResultsItem>>()
     val movieTvData : LiveData<List<ResultsItem>>
         get() = _movieTvData
 
-    fun getData(path: String, query: String, onFailedCallback: (String) -> Unit){
+    private val _errorMsg = MutableLiveData<String>()
+    val errorMsg : LiveData<String>
+        get() = _errorMsg
+
+    init {
+        getData(endpoint, query)
+    }
+
+    fun getData(path: String, query: String){
         ApiConfig.getApiService()
             .getMovies(path, BuildConfig.API_KEY, "en-US", 1, query)
             .enqueue(object : Callback<MovieTvResponse> {
@@ -30,12 +39,12 @@ class ListViewModel: ViewModel() {
                         val movieData = response.body()!!.results!!
                         _movieTvData.postValue(movieData)
                     } else {
-                        onFailedCallback(response.message())
+                        _errorMsg.postValue(response.message())
                         Log.e("TAG", "onFailure: ${response.message()}")
                     }
                 }
                 override fun onFailure(call: Call<MovieTvResponse>, t: Throwable) {
-                    onFailedCallback(t.message!!)
+                    _errorMsg.postValue(t.message)
                     Log.d("Failure", t.message!!)
                 }
             })
