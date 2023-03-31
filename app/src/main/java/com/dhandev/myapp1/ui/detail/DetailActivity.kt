@@ -114,6 +114,7 @@ class DetailActivity : AppCompatActivity() {
                             isFirstResource: Boolean
                         ): Boolean {
                             retrySnackBar()
+                            skeleton.showOriginal()
                             return false
                         }
 
@@ -129,6 +130,7 @@ class DetailActivity : AppCompatActivity() {
                         }
 
                     })
+                    .placeholder(R.drawable.ic_baseline_image_24)
                     .into(ivBackdrop)
                 Glide.with(this@DetailActivity)
                     .load("https://image.tmdb.org/t/p/original${it?.posterPath}")
@@ -141,6 +143,7 @@ class DetailActivity : AppCompatActivity() {
                             isFirstResource: Boolean
                         ): Boolean {
                             retrySnackBar()
+                            skeletonPoster.showOriginal()
                             return false
                         }
 
@@ -156,12 +159,13 @@ class DetailActivity : AppCompatActivity() {
                         }
 
                     })
+                    .placeholder(R.drawable.ic_baseline_image_24)
                     .into(ivPoster)
 
-                tvOverviewTitle.text = it?.originalTitle
-                tvReleaseDate.text = it?.releaseDate
+                tvOverviewTitle.text = it?.originalTitle.let { if(it == "") getString(R.string.data_not_found) else it}
+                tvReleaseDate.text = it?.releaseDate.let { if(it == "") getString(R.string.data_not_found) else it}
                 tvRating.text = getString(R.string.rating, it?.voteAverage.toString())
-                tvOverview.text = it?.overview
+                tvOverview.text = it?.overview.let { if (it == "") getString(R.string.data_not_found) else it }
 
                 viewModel.getById(this@DetailActivity, this@DetailActivity, id)
 
@@ -202,7 +206,6 @@ class DetailActivity : AppCompatActivity() {
                         noCommentsFound.visibility = View.VISIBLE
                         binding.rvComment.isVisible = false
                     } else {
-                        noCommentsFound.text = getString(R.string.lorem)
                         noCommentsFound.visibility = View.GONE
                         adapter.setAdapter(result)
                         binding.rvComment.isVisible = result.isNotEmpty()
@@ -215,10 +218,8 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun retrySnackBar() {
-        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.image_failed_load), "Retry", Snackbar.LENGTH_INDEFINITE) {
-            val mIntent = intent
-            finish()
-            startActivity(mIntent)
+        uiUtil.showSnackBar(this@DetailActivity, binding.root, getString(R.string.image_failed_load), "Retry", Snackbar.LENGTH_SHORT) {
+            getData(id, path)
         }
     }
 

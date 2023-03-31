@@ -31,6 +31,17 @@
         style="@style/TextAppearance.AppCompat.Headline"/>
 
     <TextView
+        android:id="@+id/tv_rating"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="4dp"
+        tools:text="Rating: 5.0"
+        android:textColor="@color/white"
+        tools:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@id/tv_movie_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_movie_title"/>
+    <TextView
         android:id="@+id/tv_movie_overview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -41,8 +52,8 @@
         android:layout_marginTop="4dp"
         android:ellipsize="end"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/tv_movie_title"
-        app:layout_constraintTop_toBottomOf="@id/tv_movie_title"
+        app:layout_constraintStart_toStartOf="@id/tv_rating"
+        app:layout_constraintTop_toBottomOf="@id/tv_rating"
         style="@style/TextAppearance.AppCompat.Body1"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -110,6 +110,7 @@ class PeopleDetailActivity : AppCompatActivity() {
             Glide.with(this)
                 .load("https://image.tmdb.org/t/p/original/${peopleData.profilePath}")
                 .transform(RoundedCorners(16))
+                .placeholder(R.drawable.ic_baseline_image_24)
                 .into(binding.ivProfile)
             binding.tvName.text = peopleData.name
             val gender = when(peopleData.gender){
@@ -117,7 +118,7 @@ class PeopleDetailActivity : AppCompatActivity() {
                 2 -> "Male"
                 else -> "Not Specified"
             }
-            binding.tvAct.text = "$gender, ${peopleData.knownForDepartment}"
+            binding.tvAct.text = getString(R.string.gender_act, gender, peopleData.knownForDepartment)
 
             val birthDate = peopleData.birthday?.split("-")
             val year = birthDate?.get(0)
@@ -127,14 +128,16 @@ class PeopleDetailActivity : AppCompatActivity() {
             val yearDeath = deathDate?.get(0)
             val monthDeath = deathDate?.get(1)
             val dayDeath = deathDate?.get(2)
-            if (birthDate != null && peopleData.deathday == null) {
-                binding.tvBirthday.text = "${peopleData.birthday} (${DateUtil().getDate(year!!, month!!, day!!)} years old)"
+            binding.tvBirthday.text = if (birthDate != null && peopleData.deathday == null) {
+                getString(R.string.birthday_age, peopleData.birthday, DateUtil().getAge(year!!, month!!, day!!))
             } else if (peopleData.deathday != null){
-                binding.tvBirthday.text = "${peopleData.birthday} (Death at ${DateUtil().getDeathDate(year!!, month!!, day!!, yearDeath!!, monthDeath!!, dayDeath!!)} years old)"
+                getString(R.string.birthday_age_death, peopleData.birthday, DateUtil().getDeathAge(year!!, month!!, day!!, yearDeath!!, monthDeath!!, dayDeath!!))
+            } else {
+                getString(R.string.data_not_found)
             }
-            binding.tvLoc.text = peopleData.placeOfBirth
-            binding.tvKnownAs.text = peopleData.alsoKnownAs?.joinToString(",")
-            binding.tvBio.text = peopleData.biography
+            binding.tvLoc.text = peopleData.placeOfBirth ?: getString(R.string.data_not_found)
+            binding.tvKnownAs.text = peopleData.alsoKnownAs?.joinToString(",")  ?: getString(R.string.data_not_found)
+            binding.tvBio.text = peopleData.biography.let { if(it == "") getString(R.string.data_not_found) else it}
             skeleton.showOriginal()
             skeletonBio.showOriginal()
             loading.dismiss()

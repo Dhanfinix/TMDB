@@ -28,6 +28,7 @@ class MovieListAdapter: RecyclerView.Adapter<MovieViewHolder>() {
             .transform(RoundedCorners(16))
             .into(holder.ivPoster)
         holder.tvTitle.text = list[position].originalTitle
+        holder.tvRating.text = holder.itemView.context.getString(R.string.rating, list[position].voteAverage.toString())
         holder.tvOverview.text = list[position].overview
         holder.itemView.setOnClickListener {
             list[position]?.let { it1 -> delegate?.onItemClicked(it1) }

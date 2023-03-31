@@ -3,7 +3,7 @@ package com.dhandev.myapp1.utils
 import java.util.*
 
 class DateUtil {
-    fun getDate(year: String, month: String, day: String): String{
+    fun getAge(year: String, month: String, day: String): String{
         val birth = Calendar.getInstance()
         val today = Calendar.getInstance()
 
@@ -17,7 +17,7 @@ class DateUtil {
         return age.toString()
     }
 
-    fun getDeathDate(year: String, month: String, day: String, yearDeath: String, monthDeath: String, dayDeath: String): String{
+    fun getDeathAge(year: String, month: String, day: String, yearDeath: String, monthDeath: String, dayDeath: String): String{
         val birth = Calendar.getInstance()
         val death = Calendar.getInstance()
 

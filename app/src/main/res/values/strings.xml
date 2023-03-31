@@ -60,5 +60,9 @@
     <string name="home">Home</string>
     <string name="greetings">Hello, %1$s!</string>
     <string name="no_results_found">No Results Found!</string>
+    <string name="gender_act">%1$s, %2$s</string>
+    <string name="birthday_age">%1$s (%2$s years old)</string>
+    <string name="birthday_age_death">%1$s (Death at %2$s years old)</string>
+    <string name="data_not_found">-data not found-</string>
 </resources>
 
